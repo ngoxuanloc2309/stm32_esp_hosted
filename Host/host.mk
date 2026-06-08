@@ -18,7 +18,8 @@ $(HOST_DIR)/Components/trans_spi/src/ctrl_core_wrapper.c \
 $(HOST_ESP_DIR)/stm32/driver/transport/transport_drv.c \
 $(HOST_ESP_DIR)/stm32/virtual_serial_if/src/serial_ll_if.c \
 $(HOST_ESP_DIR)/stm32/netif/src/netdev_if.c \
-$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host/stm32/driver/serial/serial_ll_if.c 
+$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host/stm32/driver/serial/serial_ll_if.c \
+$(HOST_DIR)/Components/trans_spi/src/netdev_if.c
 
 #$(HOST_ESP_DIR)/control_lib/src/ctrl_core.c \
 
