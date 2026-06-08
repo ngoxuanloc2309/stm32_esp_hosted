@@ -1,6 +1,8 @@
-#define GPIO_HANDSHAKE_PORT     GPIOB
-#define GPIO_HANDSHAKE_PIN      GPIO_PIN_1
-#define GPIO_DATA_READY_PORT    GPIOB
-#define GPIO_DATA_READY_PIN     GPIO_PIN_0
-#define USR_SPI_CS_GPIO_Port    GPIOA
-#define USR_SPI_CS_Pin          GPIO_PIN_4
+#ifndef __APP_CONFIG_H
+#define __APP_CONFIG_H
+
+#define APP_WIFI_SSID        "your_ssid"
+#define APP_WIFI_PASSWORD    "your_password"
+#define APP_TASK_STACK_SIZE  4096
+
+#endif
