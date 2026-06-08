@@ -1,0 +1,926 @@
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"freertos.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/freertos.c"
+  20              		.section	.text.StartDefaultTask,"ax",%progbits
+  21              		.align	1
+  22              		.global	StartDefaultTask
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	StartDefaultTask:
+  28              	.LFB141:
+   1:Core/Src/freertos.c **** /* USER CODE BEGIN Header */
+   2:Core/Src/freertos.c **** /* USER CODE END Header */
+   3:Core/Src/freertos.c **** 
+   4:Core/Src/freertos.c **** /* Includes ------------------------------------------------------------------*/
+   5:Core/Src/freertos.c **** #include "FreeRTOS.h"
+   6:Core/Src/freertos.c **** #include "task.h"
+   7:Core/Src/freertos.c **** #include "main.h"
+   8:Core/Src/freertos.c **** #include "cmsis_os.h"
+   9:Core/Src/freertos.c **** 
+  10:Core/Src/freertos.c **** /* Private includes ----------------------------------------------------------*/
+  11:Core/Src/freertos.c **** /* USER CODE BEGIN Includes */
+  12:Core/Src/freertos.c **** #include "spi.h"
+  13:Core/Src/freertos.c **** #include "usart.h"
+  14:Core/Src/freertos.c **** #include <string.h>
+  15:Core/Src/freertos.c **** #include "event_groups.h"
+  16:Core/Src/freertos.c **** /* USER CODE END Includes */
+  17:Core/Src/freertos.c **** 
+  18:Core/Src/freertos.c **** /* Private typedef -----------------------------------------------------------*/
+  19:Core/Src/freertos.c **** /* USER CODE BEGIN PTD */
+  20:Core/Src/freertos.c **** 
+  21:Core/Src/freertos.c **** /* USER CODE END PTD */
+  22:Core/Src/freertos.c **** 
+  23:Core/Src/freertos.c **** /* Private define ------------------------------------------------------------*/
+  24:Core/Src/freertos.c **** /* USER CODE BEGIN PD */
+  25:Core/Src/freertos.c **** 
+  26:Core/Src/freertos.c **** /* USER CODE END PD */
+  27:Core/Src/freertos.c **** 
+  28:Core/Src/freertos.c **** /* Private macro -------------------------------------------------------------*/
+  29:Core/Src/freertos.c **** /* USER CODE BEGIN PM */
+  30:Core/Src/freertos.c **** 
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 2
+
+
+  31:Core/Src/freertos.c **** /* USER CODE END PM */
+  32:Core/Src/freertos.c **** 
+  33:Core/Src/freertos.c **** /* Private variables ---------------------------------------------------------*/
+  34:Core/Src/freertos.c **** /* USER CODE BEGIN Variables */
+  35:Core/Src/freertos.c **** osMutexId spiMutexHandle;
+  36:Core/Src/freertos.c **** osSemaphoreId txDoneSemHandle;
+  37:Core/Src/freertos.c **** EventGroupHandle_t spiEventHandle;
+  38:Core/Src/freertos.c **** 
+  39:Core/Src/freertos.c **** osThreadId spiTxTaskHandle;
+  40:Core/Src/freertos.c **** osThreadId spiRxTaskHandle;
+  41:Core/Src/freertos.c **** 
+  42:Core/Src/freertos.c **** #define EVT_SENT     (1 << 0)
+  43:Core/Src/freertos.c **** #define EVT_RECEIVED (1 << 1)
+  44:Core/Src/freertos.c **** #define EVT_ERROR    (1 << 2)
+  45:Core/Src/freertos.c **** 
+  46:Core/Src/freertos.c **** static uint8_t tx_buf[] = "Hello ESP32";
+  47:Core/Src/freertos.c **** static uint8_t rx_buf[16];
+  48:Core/Src/freertos.c **** /* USER CODE END Variables */
+  49:Core/Src/freertos.c **** osThreadId defaultTaskHandle;
+  50:Core/Src/freertos.c **** 
+  51:Core/Src/freertos.c **** /* Private function prototypes -----------------------------------------------*/
+  52:Core/Src/freertos.c **** /* USER CODE BEGIN FunctionPrototypes */
+  53:Core/Src/freertos.c **** void SpiTxTask(void const *argument);
+  54:Core/Src/freertos.c **** void SpiRxTask(void const *argument);
+  55:Core/Src/freertos.c **** void UART_Log(const char *msg);
+  56:Core/Src/freertos.c **** /* USER CODE END FunctionPrototypes */
+  57:Core/Src/freertos.c **** 
+  58:Core/Src/freertos.c **** void StartDefaultTask(void const * argument);
+  59:Core/Src/freertos.c **** 
+  60:Core/Src/freertos.c **** void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
+  61:Core/Src/freertos.c **** 
+  62:Core/Src/freertos.c **** /* GetIdleTaskMemory prototype (linked to static allocation support) */
+  63:Core/Src/freertos.c **** void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskS
+  64:Core/Src/freertos.c **** 
+  65:Core/Src/freertos.c **** /* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
+  66:Core/Src/freertos.c **** static StaticTask_t xIdleTaskTCBBuffer;
+  67:Core/Src/freertos.c **** static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
+  68:Core/Src/freertos.c **** 
+  69:Core/Src/freertos.c **** void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskS
+  70:Core/Src/freertos.c **** {
+  71:Core/Src/freertos.c ****   *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
+  72:Core/Src/freertos.c ****   *ppxIdleTaskStackBuffer = &xIdleStack[0];
+  73:Core/Src/freertos.c ****   *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+  74:Core/Src/freertos.c ****   /* place for user code */
+  75:Core/Src/freertos.c **** }
+  76:Core/Src/freertos.c **** /* USER CODE END GET_IDLE_TASK_MEMORY */
+  77:Core/Src/freertos.c **** 
+  78:Core/Src/freertos.c **** /**
+  79:Core/Src/freertos.c ****   * @brief  FreeRTOS initialization
+  80:Core/Src/freertos.c ****   * @param  None
+  81:Core/Src/freertos.c ****   * @retval None
+  82:Core/Src/freertos.c ****   */
+  83:Core/Src/freertos.c **** void MX_FREERTOS_Init(void) {
+  84:Core/Src/freertos.c ****   /* USER CODE BEGIN Init */
+  85:Core/Src/freertos.c **** 
+  86:Core/Src/freertos.c ****   /* USER CODE END Init */
+  87:Core/Src/freertos.c **** 
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 3
+
+
+  88:Core/Src/freertos.c ****   /* USER CODE BEGIN RTOS_MUTEX */
+  89:Core/Src/freertos.c ****   /* add mutexes, ... */
+  90:Core/Src/freertos.c ****   osMutexDef(spiMutex);
+  91:Core/Src/freertos.c ****   spiMutexHandle = osMutexCreate(osMutex(spiMutex));
+  92:Core/Src/freertos.c ****   /* USER CODE END RTOS_MUTEX */
+  93:Core/Src/freertos.c **** 
+  94:Core/Src/freertos.c ****   /* USER CODE BEGIN RTOS_SEMAPHORES */
+  95:Core/Src/freertos.c ****   /* add semaphores, ... */
+  96:Core/Src/freertos.c ****   osSemaphoreDef(txDoneSem);
+  97:Core/Src/freertos.c ****   txDoneSemHandle = osSemaphoreCreate(osSemaphore(txDoneSem), 1);
+  98:Core/Src/freertos.c ****   osSemaphoreWait(txDoneSemHandle, osWaitForever); // init count = 0
+  99:Core/Src/freertos.c ****   /* USER CODE END RTOS_SEMAPHORES */
+ 100:Core/Src/freertos.c **** 
+ 101:Core/Src/freertos.c ****   /* USER CODE BEGIN RTOS_TIMERS */
+ 102:Core/Src/freertos.c ****   /* start timers, add new ones, ... */
+ 103:Core/Src/freertos.c ****   /* USER CODE END RTOS_TIMERS */
+ 104:Core/Src/freertos.c **** 
+ 105:Core/Src/freertos.c ****   /* USER CODE BEGIN RTOS_QUEUES */
+ 106:Core/Src/freertos.c ****   /* add queues, ... */
+ 107:Core/Src/freertos.c ****   /* USER CODE END RTOS_QUEUES */
+ 108:Core/Src/freertos.c **** 
+ 109:Core/Src/freertos.c ****   /* Create the thread(s) */
+ 110:Core/Src/freertos.c ****   /* definition and creation of defaultTask */
+ 111:Core/Src/freertos.c ****   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 1024);
+ 112:Core/Src/freertos.c ****   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+ 113:Core/Src/freertos.c **** 
+ 114:Core/Src/freertos.c ****   /* USER CODE BEGIN RTOS_THREADS */
+ 115:Core/Src/freertos.c ****   /* add threads, ... */
+ 116:Core/Src/freertos.c ****   osThreadDef(spiTxTask, SpiTxTask, osPriorityNormal, 0, 512);
+ 117:Core/Src/freertos.c ****   spiTxTaskHandle = osThreadCreate(osThread(spiTxTask), NULL);
+ 118:Core/Src/freertos.c **** 
+ 119:Core/Src/freertos.c ****   osThreadDef(spiRxTask, SpiRxTask, osPriorityNormal, 0, 512);
+ 120:Core/Src/freertos.c ****   spiRxTaskHandle = osThreadCreate(osThread(spiRxTask), NULL);
+ 121:Core/Src/freertos.c **** 
+ 122:Core/Src/freertos.c ****   spiEventHandle = xEventGroupCreate();
+ 123:Core/Src/freertos.c ****   /* USER CODE END RTOS_THREADS */
+ 124:Core/Src/freertos.c **** 
+ 125:Core/Src/freertos.c **** }
+ 126:Core/Src/freertos.c **** 
+ 127:Core/Src/freertos.c **** /* USER CODE BEGIN Header_StartDefaultTask */
+ 128:Core/Src/freertos.c **** /**
+ 129:Core/Src/freertos.c ****   * @brief  Function implementing the defaultTask thread.
+ 130:Core/Src/freertos.c ****   * @param  argument: Not used
+ 131:Core/Src/freertos.c ****   * @retval None
+ 132:Core/Src/freertos.c ****   */
+ 133:Core/Src/freertos.c **** /* USER CODE END Header_StartDefaultTask */
+ 134:Core/Src/freertos.c **** void StartDefaultTask(void const * argument)
+ 135:Core/Src/freertos.c **** {
+  29              		.loc 1 135 1 view -0
+  30              		.cfi_startproc
+  31              		@ Volatile: function does not return.
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              	.LVL0:
+  35              		.loc 1 135 1 is_stmt 0 view .LVU1
+  36 0000 08B5     		push	{r3, lr}
+  37              	.LCFI0:
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 4
+
+
+  38              		.cfi_def_cfa_offset 8
+  39              		.cfi_offset 3, -8
+  40              		.cfi_offset 14, -4
+  41              	.LVL1:
+  42              	.L2:
+ 136:Core/Src/freertos.c ****   /* USER CODE BEGIN StartDefaultTask */
+ 137:Core/Src/freertos.c ****   /* Infinite loop */
+ 138:Core/Src/freertos.c ****   for(;;)
+  43              		.loc 1 138 3 is_stmt 1 view .LVU2
+ 139:Core/Src/freertos.c ****   {
+ 140:Core/Src/freertos.c ****     osDelay(1);
+  44              		.loc 1 140 5 discriminator 1 view .LVU3
+  45 0002 0120     		movs	r0, #1
+  46 0004 FFF7FEFF 		bl	osDelay
+  47              	.LVL2:
+ 138:Core/Src/freertos.c ****   {
+  48              		.loc 1 138 3 view .LVU4
+  49 0008 FBE7     		b	.L2
+  50              		.cfi_endproc
+  51              	.LFE141:
+  53              		.section	.text.vApplicationGetIdleTaskMemory,"ax",%progbits
+  54              		.align	1
+  55              		.global	vApplicationGetIdleTaskMemory
+  56              		.syntax unified
+  57              		.thumb
+  58              		.thumb_func
+  60              	vApplicationGetIdleTaskMemory:
+  61              	.LVL3:
+  62              	.LFB139:
+  70:Core/Src/freertos.c ****   *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
+  63              		.loc 1 70 1 view -0
+  64              		.cfi_startproc
+  65              		@ args = 0, pretend = 0, frame = 0
+  66              		@ frame_needed = 0, uses_anonymous_args = 0
+  67              		@ link register save eliminated.
+  71:Core/Src/freertos.c ****   *ppxIdleTaskStackBuffer = &xIdleStack[0];
+  68              		.loc 1 71 3 view .LVU6
+  71:Core/Src/freertos.c ****   *ppxIdleTaskStackBuffer = &xIdleStack[0];
+  69              		.loc 1 71 25 is_stmt 0 view .LVU7
+  70 0000 034B     		ldr	r3, .L5
+  71 0002 0360     		str	r3, [r0]
+  72:Core/Src/freertos.c ****   *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+  72              		.loc 1 72 3 is_stmt 1 view .LVU8
+  72:Core/Src/freertos.c ****   *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+  73              		.loc 1 72 27 is_stmt 0 view .LVU9
+  74 0004 034B     		ldr	r3, .L5+4
+  75 0006 0B60     		str	r3, [r1]
+  73:Core/Src/freertos.c ****   /* place for user code */
+  76              		.loc 1 73 3 is_stmt 1 view .LVU10
+  73:Core/Src/freertos.c ****   /* place for user code */
+  77              		.loc 1 73 25 is_stmt 0 view .LVU11
+  78 0008 4FF48073 		mov	r3, #256
+  79 000c 1360     		str	r3, [r2]
+  75:Core/Src/freertos.c **** /* USER CODE END GET_IDLE_TASK_MEMORY */
+  80              		.loc 1 75 1 view .LVU12
+  81 000e 7047     		bx	lr
+  82              	.L6:
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 5
+
+
+  83              		.align	2
+  84              	.L5:
+  85 0010 00000000 		.word	xIdleTaskTCBBuffer
+  86 0014 00000000 		.word	xIdleStack
+  87              		.cfi_endproc
+  88              	.LFE139:
+  90              		.section	.text.MX_FREERTOS_Init,"ax",%progbits
+  91              		.align	1
+  92              		.global	MX_FREERTOS_Init
+  93              		.syntax unified
+  94              		.thumb
+  95              		.thumb_func
+  97              	MX_FREERTOS_Init:
+  98              	.LFB140:
+  83:Core/Src/freertos.c ****   /* USER CODE BEGIN Init */
+  99              		.loc 1 83 29 is_stmt 1 view -0
+ 100              		.cfi_startproc
+ 101              		@ args = 0, pretend = 0, frame = 104
+ 102              		@ frame_needed = 0, uses_anonymous_args = 0
+ 103 0000 30B5     		push	{r4, r5, lr}
+ 104              	.LCFI1:
+ 105              		.cfi_def_cfa_offset 12
+ 106              		.cfi_offset 4, -12
+ 107              		.cfi_offset 5, -8
+ 108              		.cfi_offset 14, -4
+ 109 0002 9BB0     		sub	sp, sp, #108
+ 110              	.LCFI2:
+ 111              		.cfi_def_cfa_offset 120
+  90:Core/Src/freertos.c ****   spiMutexHandle = osMutexCreate(osMutex(spiMutex));
+ 112              		.loc 1 90 3 view .LVU14
+ 113 0004 0025     		movs	r5, #0
+ 114 0006 1895     		str	r5, [sp, #96]
+ 115 0008 1995     		str	r5, [sp, #100]
+  91:Core/Src/freertos.c ****   /* USER CODE END RTOS_MUTEX */
+ 116              		.loc 1 91 3 view .LVU15
+  91:Core/Src/freertos.c ****   /* USER CODE END RTOS_MUTEX */
+ 117              		.loc 1 91 20 is_stmt 0 view .LVU16
+ 118 000a 18A8     		add	r0, sp, #96
+ 119 000c FFF7FEFF 		bl	osMutexCreate
+ 120              	.LVL4:
+  91:Core/Src/freertos.c ****   /* USER CODE END RTOS_MUTEX */
+ 121              		.loc 1 91 18 discriminator 1 view .LVU17
+ 122 0010 244B     		ldr	r3, .L9
+ 123 0012 1860     		str	r0, [r3]
+  96:Core/Src/freertos.c ****   txDoneSemHandle = osSemaphoreCreate(osSemaphore(txDoneSem), 1);
+ 124              		.loc 1 96 3 is_stmt 1 view .LVU18
+ 125 0014 1695     		str	r5, [sp, #88]
+ 126 0016 1795     		str	r5, [sp, #92]
+  97:Core/Src/freertos.c ****   osSemaphoreWait(txDoneSemHandle, osWaitForever); // init count = 0
+ 127              		.loc 1 97 3 view .LVU19
+  97:Core/Src/freertos.c ****   osSemaphoreWait(txDoneSemHandle, osWaitForever); // init count = 0
+ 128              		.loc 1 97 21 is_stmt 0 view .LVU20
+ 129 0018 0121     		movs	r1, #1
+ 130 001a 16A8     		add	r0, sp, #88
+ 131 001c FFF7FEFF 		bl	osSemaphoreCreate
+ 132              	.LVL5:
+  97:Core/Src/freertos.c ****   osSemaphoreWait(txDoneSemHandle, osWaitForever); // init count = 0
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 6
+
+
+ 133              		.loc 1 97 19 discriminator 1 view .LVU21
+ 134 0020 214B     		ldr	r3, .L9+4
+ 135 0022 1860     		str	r0, [r3]
+  98:Core/Src/freertos.c ****   /* USER CODE END RTOS_SEMAPHORES */
+ 136              		.loc 1 98 3 is_stmt 1 view .LVU22
+ 137 0024 4FF0FF31 		mov	r1, #-1
+ 138 0028 FFF7FEFF 		bl	osSemaphoreWait
+ 139              	.LVL6:
+ 111:Core/Src/freertos.c ****   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+ 140              		.loc 1 111 3 view .LVU23
+ 141 002c 1F4C     		ldr	r4, .L9+8
+ 142 002e 0DF13C0C 		add	ip, sp, #60
+ 143 0032 A646     		mov	lr, r4
+ 144 0034 BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
+ 145 0038 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 146 003c 9EE80700 		ldm	lr, {r0, r1, r2}
+ 147 0040 8CE80700 		stm	ip, {r0, r1, r2}
+ 112:Core/Src/freertos.c **** 
+ 148              		.loc 1 112 3 view .LVU24
+ 112:Core/Src/freertos.c **** 
+ 149              		.loc 1 112 23 is_stmt 0 view .LVU25
+ 150 0044 2946     		mov	r1, r5
+ 151 0046 0FA8     		add	r0, sp, #60
+ 152 0048 FFF7FEFF 		bl	osThreadCreate
+ 153              	.LVL7:
+ 112:Core/Src/freertos.c **** 
+ 154              		.loc 1 112 21 discriminator 1 view .LVU26
+ 155 004c 184B     		ldr	r3, .L9+12
+ 156 004e 1860     		str	r0, [r3]
+ 116:Core/Src/freertos.c ****   spiTxTaskHandle = osThreadCreate(osThread(spiTxTask), NULL);
+ 157              		.loc 1 116 3 is_stmt 1 view .LVU27
+ 158 0050 0DF1200C 		add	ip, sp, #32
+ 159 0054 04F11C0E 		add	lr, r4, #28
+ 160 0058 BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
+ 161 005c ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 162 0060 9EE80700 		ldm	lr, {r0, r1, r2}
+ 163 0064 8CE80700 		stm	ip, {r0, r1, r2}
+ 117:Core/Src/freertos.c **** 
+ 164              		.loc 1 117 3 view .LVU28
+ 117:Core/Src/freertos.c **** 
+ 165              		.loc 1 117 21 is_stmt 0 view .LVU29
+ 166 0068 2946     		mov	r1, r5
+ 167 006a 08A8     		add	r0, sp, #32
+ 168 006c FFF7FEFF 		bl	osThreadCreate
+ 169              	.LVL8:
+ 117:Core/Src/freertos.c **** 
+ 170              		.loc 1 117 19 discriminator 1 view .LVU30
+ 171 0070 104B     		ldr	r3, .L9+16
+ 172 0072 1860     		str	r0, [r3]
+ 119:Core/Src/freertos.c ****   spiRxTaskHandle = osThreadCreate(osThread(spiRxTask), NULL);
+ 173              		.loc 1 119 3 is_stmt 1 view .LVU31
+ 174 0074 0DF1040E 		add	lr, sp, #4
+ 175 0078 04F1380C 		add	ip, r4, #56
+ 176 007c BCE80F00 		ldmia	ip!, {r0, r1, r2, r3}
+ 177 0080 AEE80F00 		stmia	lr!, {r0, r1, r2, r3}
+ 178 0084 9CE80700 		ldm	ip, {r0, r1, r2}
+ 179 0088 8EE80700 		stm	lr, {r0, r1, r2}
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 7
+
+
+ 120:Core/Src/freertos.c **** 
+ 180              		.loc 1 120 3 view .LVU32
+ 120:Core/Src/freertos.c **** 
+ 181              		.loc 1 120 21 is_stmt 0 view .LVU33
+ 182 008c 2946     		mov	r1, r5
+ 183 008e 01A8     		add	r0, sp, #4
+ 184 0090 FFF7FEFF 		bl	osThreadCreate
+ 185              	.LVL9:
+ 120:Core/Src/freertos.c **** 
+ 186              		.loc 1 120 19 discriminator 1 view .LVU34
+ 187 0094 084B     		ldr	r3, .L9+20
+ 188 0096 1860     		str	r0, [r3]
+ 122:Core/Src/freertos.c ****   /* USER CODE END RTOS_THREADS */
+ 189              		.loc 1 122 3 is_stmt 1 view .LVU35
+ 122:Core/Src/freertos.c ****   /* USER CODE END RTOS_THREADS */
+ 190              		.loc 1 122 20 is_stmt 0 view .LVU36
+ 191 0098 FFF7FEFF 		bl	xEventGroupCreate
+ 192              	.LVL10:
+ 122:Core/Src/freertos.c ****   /* USER CODE END RTOS_THREADS */
+ 193              		.loc 1 122 18 discriminator 1 view .LVU37
+ 194 009c 074B     		ldr	r3, .L9+24
+ 195 009e 1860     		str	r0, [r3]
+ 125:Core/Src/freertos.c **** 
+ 196              		.loc 1 125 1 view .LVU38
+ 197 00a0 1BB0     		add	sp, sp, #108
+ 198              	.LCFI3:
+ 199              		.cfi_def_cfa_offset 12
+ 200              		@ sp needed
+ 201 00a2 30BD     		pop	{r4, r5, pc}
+ 202              	.L10:
+ 203              		.align	2
+ 204              	.L9:
+ 205 00a4 00000000 		.word	spiMutexHandle
+ 206 00a8 00000000 		.word	txDoneSemHandle
+ 207 00ac 00000000 		.word	.LANCHOR0
+ 208 00b0 00000000 		.word	defaultTaskHandle
+ 209 00b4 00000000 		.word	spiTxTaskHandle
+ 210 00b8 00000000 		.word	spiRxTaskHandle
+ 211 00bc 00000000 		.word	spiEventHandle
+ 212              		.cfi_endproc
+ 213              	.LFE140:
+ 215              		.section	.text.UART_Log,"ax",%progbits
+ 216              		.align	1
+ 217              		.global	UART_Log
+ 218              		.syntax unified
+ 219              		.thumb
+ 220              		.thumb_func
+ 222              	UART_Log:
+ 223              	.LVL11:
+ 224              	.LFB142:
+ 141:Core/Src/freertos.c ****   }
+ 142:Core/Src/freertos.c ****   /* USER CODE END StartDefaultTask */
+ 143:Core/Src/freertos.c **** }
+ 144:Core/Src/freertos.c **** 
+ 145:Core/Src/freertos.c **** /* Private application code --------------------------------------------------*/
+ 146:Core/Src/freertos.c **** /* USER CODE BEGIN Application */
+ 147:Core/Src/freertos.c **** void UART_Log(const char *msg)
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 8
+
+
+ 148:Core/Src/freertos.c **** {
+ 225              		.loc 1 148 1 is_stmt 1 view -0
+ 226              		.cfi_startproc
+ 227              		@ args = 0, pretend = 0, frame = 0
+ 228              		@ frame_needed = 0, uses_anonymous_args = 0
+ 229              		.loc 1 148 1 is_stmt 0 view .LVU40
+ 230 0000 10B5     		push	{r4, lr}
+ 231              	.LCFI4:
+ 232              		.cfi_def_cfa_offset 8
+ 233              		.cfi_offset 4, -8
+ 234              		.cfi_offset 14, -4
+ 235 0002 0446     		mov	r4, r0
+ 149:Core/Src/freertos.c ****     HAL_UART_Transmit(&huart5, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
+ 236              		.loc 1 149 5 is_stmt 1 view .LVU41
+ 237              		.loc 1 149 47 is_stmt 0 view .LVU42
+ 238 0004 FFF7FEFF 		bl	strlen
+ 239              	.LVL12:
+ 240              		.loc 1 149 5 discriminator 1 view .LVU43
+ 241 0008 4FF0FF33 		mov	r3, #-1
+ 242 000c 82B2     		uxth	r2, r0
+ 243 000e 2146     		mov	r1, r4
+ 244 0010 0148     		ldr	r0, .L13
+ 245 0012 FFF7FEFF 		bl	HAL_UART_Transmit
+ 246              	.LVL13:
+ 150:Core/Src/freertos.c **** }
+ 247              		.loc 1 150 1 view .LVU44
+ 248 0016 10BD     		pop	{r4, pc}
+ 249              	.LVL14:
+ 250              	.L14:
+ 251              		.loc 1 150 1 view .LVU45
+ 252              		.align	2
+ 253              	.L13:
+ 254 0018 00000000 		.word	huart5
+ 255              		.cfi_endproc
+ 256              	.LFE142:
+ 258              		.section	.rodata.SpiTxTask.str1.4,"aMS",%progbits,1
+ 259              		.align	2
+ 260              	.LC9:
+ 261 0000 53544D33 		.ascii	"STM32 sent: Hello ESP32\015\012\000"
+ 261      32207365 
+ 261      6E743A20 
+ 261      48656C6C 
+ 261      6F204553 
+ 262              		.section	.text.SpiTxTask,"ax",%progbits
+ 263              		.align	1
+ 264              		.global	SpiTxTask
+ 265              		.syntax unified
+ 266              		.thumb
+ 267              		.thumb_func
+ 269              	SpiTxTask:
+ 270              	.LFB143:
+ 151:Core/Src/freertos.c **** 
+ 152:Core/Src/freertos.c **** void SpiTxTask(void const *argument)
+ 153:Core/Src/freertos.c **** {
+ 271              		.loc 1 153 1 is_stmt 1 view -0
+ 272              		.cfi_startproc
+ 273              		@ Volatile: function does not return.
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 9
+
+
+ 274              		@ args = 0, pretend = 0, frame = 0
+ 275              		@ frame_needed = 0, uses_anonymous_args = 0
+ 276              	.LVL15:
+ 277              		.loc 1 153 1 is_stmt 0 view .LVU47
+ 278 0000 00B5     		push	{lr}
+ 279              	.LCFI5:
+ 280              		.cfi_def_cfa_offset 4
+ 281              		.cfi_offset 14, -4
+ 282 0002 83B0     		sub	sp, sp, #12
+ 283              	.LCFI6:
+ 284              		.cfi_def_cfa_offset 16
+ 285              	.LVL16:
+ 286              	.L16:
+ 154:Core/Src/freertos.c ****     for (;;) {
+ 287              		.loc 1 154 5 is_stmt 1 view .LVU48
+ 155:Core/Src/freertos.c ****         // acquire mutex to protect SPI bus
+ 156:Core/Src/freertos.c ****         osMutexWait(spiMutexHandle, osWaitForever);
+ 288              		.loc 1 156 9 view .LVU49
+ 289 0004 194D     		ldr	r5, .L18
+ 290 0006 4FF0FF31 		mov	r1, #-1
+ 291 000a 2868     		ldr	r0, [r5]
+ 292 000c FFF7FEFF 		bl	osMutexWait
+ 293              	.LVL17:
+ 157:Core/Src/freertos.c **** 
+ 158:Core/Src/freertos.c ****         memset(rx_buf, 0, sizeof(rx_buf));
+ 294              		.loc 1 158 9 view .LVU50
+ 295 0010 174C     		ldr	r4, .L18+4
+ 296 0012 0022     		movs	r2, #0
+ 297 0014 2260     		str	r2, [r4]
+ 298 0016 6260     		str	r2, [r4, #4]
+ 299 0018 A260     		str	r2, [r4, #8]
+ 300 001a E260     		str	r2, [r4, #12]
+ 159:Core/Src/freertos.c ****         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+ 301              		.loc 1 159 9 view .LVU51
+ 302 001c 154E     		ldr	r6, .L18+8
+ 303 001e 1021     		movs	r1, #16
+ 304 0020 3046     		mov	r0, r6
+ 305 0022 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 306              	.LVL18:
+ 160:Core/Src/freertos.c ****         HAL_SPI_TransmitReceive(&hspi1, tx_buf, rx_buf, sizeof(tx_buf), HAL_MAX_DELAY);
+ 307              		.loc 1 160 9 view .LVU52
+ 308 0026 4FF0FF33 		mov	r3, #-1
+ 309 002a 0093     		str	r3, [sp]
+ 310 002c 0C23     		movs	r3, #12
+ 311 002e 2246     		mov	r2, r4
+ 312 0030 1149     		ldr	r1, .L18+12
+ 313 0032 1248     		ldr	r0, .L18+16
+ 314 0034 FFF7FEFF 		bl	HAL_SPI_TransmitReceive
+ 315              	.LVL19:
+ 161:Core/Src/freertos.c ****         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+ 316              		.loc 1 161 9 view .LVU53
+ 317 0038 0122     		movs	r2, #1
+ 318 003a 1021     		movs	r1, #16
+ 319 003c 3046     		mov	r0, r6
+ 320 003e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 321              	.LVL20:
+ 162:Core/Src/freertos.c **** 
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 10
+
+
+ 163:Core/Src/freertos.c ****         UART_Log("STM32 sent: Hello ESP32\r\n");
+ 322              		.loc 1 163 9 view .LVU54
+ 323 0042 0F48     		ldr	r0, .L18+20
+ 324 0044 FFF7FEFF 		bl	UART_Log
+ 325              	.LVL21:
+ 164:Core/Src/freertos.c ****         xEventGroupSetBits(spiEventHandle, EVT_SENT);
+ 326              		.loc 1 164 9 view .LVU55
+ 327 0048 0121     		movs	r1, #1
+ 328 004a 0E4B     		ldr	r3, .L18+24
+ 329 004c 1868     		ldr	r0, [r3]
+ 330 004e FFF7FEFF 		bl	xEventGroupSetBits
+ 331              	.LVL22:
+ 165:Core/Src/freertos.c **** 
+ 166:Core/Src/freertos.c ****         osMutexRelease(spiMutexHandle);
+ 332              		.loc 1 166 9 view .LVU56
+ 333 0052 2868     		ldr	r0, [r5]
+ 334 0054 FFF7FEFF 		bl	osMutexRelease
+ 335              	.LVL23:
+ 167:Core/Src/freertos.c **** 
+ 168:Core/Src/freertos.c ****         // signal Rx task to process
+ 169:Core/Src/freertos.c ****         osSemaphoreRelease(txDoneSemHandle);
+ 336              		.loc 1 169 9 view .LVU57
+ 337 0058 0B4B     		ldr	r3, .L18+28
+ 338 005a 1868     		ldr	r0, [r3]
+ 339 005c FFF7FEFF 		bl	osSemaphoreRelease
+ 340              	.LVL24:
+ 170:Core/Src/freertos.c **** 
+ 171:Core/Src/freertos.c ****         osDelay(1000);
+ 341              		.loc 1 171 9 discriminator 1 view .LVU58
+ 342 0060 4FF47A70 		mov	r0, #1000
+ 343 0064 FFF7FEFF 		bl	osDelay
+ 344              	.LVL25:
+ 154:Core/Src/freertos.c ****         // acquire mutex to protect SPI bus
+ 345              		.loc 1 154 5 view .LVU59
+ 346 0068 CCE7     		b	.L16
+ 347              	.L19:
+ 348 006a 00BF     		.align	2
+ 349              	.L18:
+ 350 006c 00000000 		.word	spiMutexHandle
+ 351 0070 00000000 		.word	rx_buf
+ 352 0074 00000240 		.word	1073872896
+ 353 0078 00000000 		.word	tx_buf
+ 354 007c 00000000 		.word	hspi1
+ 355 0080 00000000 		.word	.LC9
+ 356 0084 00000000 		.word	spiEventHandle
+ 357 0088 00000000 		.word	txDoneSemHandle
+ 358              		.cfi_endproc
+ 359              	.LFE143:
+ 361              		.section	.rodata.SpiRxTask.str1.4,"aMS",%progbits,1
+ 362              		.align	2
+ 363              	.LC10:
+ 364 0000 48656C6C 		.ascii	"Hello\000"
+ 364      6F00
+ 365 0006 0000     		.align	2
+ 366              	.LC11:
+ 367 0008 53544D33 		.ascii	"STM32 received: \000"
+ 367      32207265 
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 11
+
+
+ 367      63656976 
+ 367      65643A20 
+ 367      00
+ 368 0019 000000   		.align	2
+ 369              	.LC12:
+ 370 001c 0D0A00   		.ascii	"\015\012\000"
+ 371 001f 00       		.align	2
+ 372              	.LC13:
+ 373 0020 53544D33 		.ascii	"STM32 RX error\015\012\000"
+ 373      32205258 
+ 373      20657272 
+ 373      6F720D0A 
+ 373      00
+ 374              		.section	.text.SpiRxTask,"ax",%progbits
+ 375              		.align	1
+ 376              		.global	SpiRxTask
+ 377              		.syntax unified
+ 378              		.thumb
+ 379              		.thumb_func
+ 381              	SpiRxTask:
+ 382              	.LFB144:
+ 172:Core/Src/freertos.c ****     }
+ 173:Core/Src/freertos.c **** }
+ 174:Core/Src/freertos.c **** 
+ 175:Core/Src/freertos.c **** void SpiRxTask(void const *argument)
+ 176:Core/Src/freertos.c **** {
+ 383              		.loc 1 176 1 view -0
+ 384              		.cfi_startproc
+ 385              		@ Volatile: function does not return.
+ 386              		@ args = 0, pretend = 0, frame = 0
+ 387              		@ frame_needed = 0, uses_anonymous_args = 0
+ 388              	.LVL26:
+ 389              		.loc 1 176 1 is_stmt 0 view .LVU61
+ 390 0000 08B5     		push	{r3, lr}
+ 391              	.LCFI7:
+ 392              		.cfi_def_cfa_offset 8
+ 393              		.cfi_offset 3, -8
+ 394              		.cfi_offset 14, -4
+ 395 0002 0DE0     		b	.L21
+ 396              	.LVL27:
+ 397              	.L25:
+ 177:Core/Src/freertos.c ****     for (;;) {
+ 178:Core/Src/freertos.c ****         // wait for Tx task to finish
+ 179:Core/Src/freertos.c ****         osSemaphoreWait(txDoneSemHandle, osWaitForever);
+ 180:Core/Src/freertos.c **** 
+ 181:Core/Src/freertos.c ****         if (strncmp((char*)rx_buf, "Hello", 5) == 0) {
+ 182:Core/Src/freertos.c ****             UART_Log("STM32 received: ");
+ 398              		.loc 1 182 13 is_stmt 1 view .LVU62
+ 399 0004 1148     		ldr	r0, .L26
+ 400 0006 FFF7FEFF 		bl	UART_Log
+ 401              	.LVL28:
+ 183:Core/Src/freertos.c ****             UART_Log((char*)rx_buf);
+ 402              		.loc 1 183 13 view .LVU63
+ 403 000a 1148     		ldr	r0, .L26+4
+ 404 000c FFF7FEFF 		bl	UART_Log
+ 405              	.LVL29:
+ 184:Core/Src/freertos.c ****             UART_Log("\r\n");
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 12
+
+
+ 406              		.loc 1 184 13 view .LVU64
+ 407 0010 1048     		ldr	r0, .L26+8
+ 408 0012 FFF7FEFF 		bl	UART_Log
+ 409              	.LVL30:
+ 185:Core/Src/freertos.c ****             xEventGroupSetBits(spiEventHandle, EVT_RECEIVED);
+ 410              		.loc 1 185 13 view .LVU65
+ 411 0016 0221     		movs	r1, #2
+ 412 0018 0F4B     		ldr	r3, .L26+12
+ 413 001a 1868     		ldr	r0, [r3]
+ 414 001c FFF7FEFF 		bl	xEventGroupSetBits
+ 415              	.LVL31:
+ 416              	.L21:
+ 177:Core/Src/freertos.c ****         // wait for Tx task to finish
+ 417              		.loc 1 177 5 view .LVU66
+ 179:Core/Src/freertos.c **** 
+ 418              		.loc 1 179 9 view .LVU67
+ 419 0020 4FF0FF31 		mov	r1, #-1
+ 420 0024 0D4B     		ldr	r3, .L26+16
+ 421 0026 1868     		ldr	r0, [r3]
+ 422 0028 FFF7FEFF 		bl	osSemaphoreWait
+ 423              	.LVL32:
+ 181:Core/Src/freertos.c ****             UART_Log("STM32 received: ");
+ 424              		.loc 1 181 9 view .LVU68
+ 181:Core/Src/freertos.c ****             UART_Log("STM32 received: ");
+ 425              		.loc 1 181 13 is_stmt 0 view .LVU69
+ 426 002c 0522     		movs	r2, #5
+ 427 002e 0C49     		ldr	r1, .L26+20
+ 428 0030 0748     		ldr	r0, .L26+4
+ 429 0032 FFF7FEFF 		bl	strncmp
+ 430              	.LVL33:
+ 181:Core/Src/freertos.c ****             UART_Log("STM32 received: ");
+ 431              		.loc 1 181 12 discriminator 1 view .LVU70
+ 432 0036 0028     		cmp	r0, #0
+ 433 0038 E4D0     		beq	.L25
+ 186:Core/Src/freertos.c ****         } else {
+ 187:Core/Src/freertos.c ****             UART_Log("STM32 RX error\r\n");
+ 434              		.loc 1 187 13 is_stmt 1 view .LVU71
+ 435 003a 0A48     		ldr	r0, .L26+24
+ 436 003c FFF7FEFF 		bl	UART_Log
+ 437              	.LVL34:
+ 188:Core/Src/freertos.c ****             xEventGroupSetBits(spiEventHandle, EVT_ERROR);
+ 438              		.loc 1 188 13 view .LVU72
+ 439 0040 0421     		movs	r1, #4
+ 440 0042 054B     		ldr	r3, .L26+12
+ 441 0044 1868     		ldr	r0, [r3]
+ 442 0046 FFF7FEFF 		bl	xEventGroupSetBits
+ 443              	.LVL35:
+ 444 004a E9E7     		b	.L21
+ 445              	.L27:
+ 446              		.align	2
+ 447              	.L26:
+ 448 004c 08000000 		.word	.LC11
+ 449 0050 00000000 		.word	rx_buf
+ 450 0054 1C000000 		.word	.LC12
+ 451 0058 00000000 		.word	spiEventHandle
+ 452 005c 00000000 		.word	txDoneSemHandle
+ 453 0060 00000000 		.word	.LC10
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 13
+
+
+ 454 0064 20000000 		.word	.LC13
+ 455              		.cfi_endproc
+ 456              	.LFE144:
+ 458              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 459              		.align	2
+ 460              	.LC4:
+ 461 0000 73706952 		.ascii	"spiRxTask\000"
+ 461      78546173 
+ 461      6B00
+ 462 000a 0000     		.align	2
+ 463              	.LC2:
+ 464 000c 73706954 		.ascii	"spiTxTask\000"
+ 464      78546173 
+ 464      6B00
+ 465 0016 0000     		.align	2
+ 466              	.LC0:
+ 467 0018 64656661 		.ascii	"defaultTask\000"
+ 467      756C7454 
+ 467      61736B00 
+ 468              		.section	.bss.xIdleStack,"aw",%nobits
+ 469              		.align	2
+ 472              	xIdleStack:
+ 473 0000 00000000 		.space	1024
+ 473      00000000 
+ 473      00000000 
+ 473      00000000 
+ 473      00000000 
+ 474              		.section	.bss.xIdleTaskTCBBuffer,"aw",%nobits
+ 475              		.align	2
+ 478              	xIdleTaskTCBBuffer:
+ 479 0000 00000000 		.space	84
+ 479      00000000 
+ 479      00000000 
+ 479      00000000 
+ 479      00000000 
+ 480              		.global	defaultTaskHandle
+ 481              		.section	.bss.defaultTaskHandle,"aw",%nobits
+ 482              		.align	2
+ 485              	defaultTaskHandle:
+ 486 0000 00000000 		.space	4
+ 487              		.section	.bss.rx_buf,"aw",%nobits
+ 488              		.align	2
+ 491              	rx_buf:
+ 492 0000 00000000 		.space	16
+ 492      00000000 
+ 492      00000000 
+ 492      00000000 
+ 493              		.section	.data.tx_buf,"aw"
+ 494              		.align	2
+ 497              	tx_buf:
+ 498 0000 48656C6C 		.ascii	"Hello ESP32\000"
+ 498      6F204553 
+ 498      50333200 
+ 499              		.global	spiRxTaskHandle
+ 500              		.section	.bss.spiRxTaskHandle,"aw",%nobits
+ 501              		.align	2
+ 504              	spiRxTaskHandle:
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 14
+
+
+ 505 0000 00000000 		.space	4
+ 506              		.global	spiTxTaskHandle
+ 507              		.section	.bss.spiTxTaskHandle,"aw",%nobits
+ 508              		.align	2
+ 511              	spiTxTaskHandle:
+ 512 0000 00000000 		.space	4
+ 513              		.global	spiEventHandle
+ 514              		.section	.bss.spiEventHandle,"aw",%nobits
+ 515              		.align	2
+ 518              	spiEventHandle:
+ 519 0000 00000000 		.space	4
+ 520              		.global	txDoneSemHandle
+ 521              		.section	.bss.txDoneSemHandle,"aw",%nobits
+ 522              		.align	2
+ 525              	txDoneSemHandle:
+ 526 0000 00000000 		.space	4
+ 527              		.global	spiMutexHandle
+ 528              		.section	.bss.spiMutexHandle,"aw",%nobits
+ 529              		.align	2
+ 532              	spiMutexHandle:
+ 533 0000 00000000 		.space	4
+ 534              		.section	.rodata
+ 535              		.align	2
+ 536              		.set	.LANCHOR0,. + 0
+ 537              	.LC6:
+ 538 0000 18000000 		.word	.LC0
+ 539 0004 00000000 		.word	StartDefaultTask
+ 540 0008 0000     		.short	0
+ 541 000a 0000     		.space	2
+ 542 000c 00000000 		.word	0
+ 543 0010 00040000 		.word	1024
+ 544 0014 00000000 		.word	0
+ 545 0018 00000000 		.word	0
+ 546              	.LC7:
+ 547 001c 0C000000 		.word	.LC2
+ 548 0020 00000000 		.word	SpiTxTask
+ 549 0024 0000     		.short	0
+ 550 0026 0000     		.space	2
+ 551 0028 00000000 		.word	0
+ 552 002c 00020000 		.word	512
+ 553 0030 00000000 		.word	0
+ 554 0034 00000000 		.word	0
+ 555              	.LC8:
+ 556 0038 00000000 		.word	.LC4
+ 557 003c 00000000 		.word	SpiRxTask
+ 558 0040 0000     		.short	0
+ 559 0042 0000     		.space	2
+ 560 0044 00000000 		.word	0
+ 561 0048 00020000 		.word	512
+ 562 004c 00000000 		.word	0
+ 563 0050 00000000 		.word	0
+ 564              		.text
+ 565              	.Letext0:
+ 566              		.file 2 "D:\\stm32cubeclt\\STM32CubeCLT_1.21.0\\GNU-tools-for-STM32\\bin\\../lib/gcc/arm-none-eabi
+ 567              		.file 3 "D:\\stm32cubeclt\\STM32CubeCLT_1.21.0\\GNU-tools-for-STM32\\bin\\../lib/gcc/arm-none-eabi
+ 568              		.file 4 "D:\\stm32cubeclt\\STM32CubeCLT_1.21.0\\GNU-tools-for-STM32\\bin\\../lib/gcc/arm-none-eabi
+ 569              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h"
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 15
+
+
+ 570              		.file 6 "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h"
+ 571              		.file 7 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
+ 572              		.file 8 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 573              		.file 9 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 574              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
+ 575              		.file 11 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 576              		.file 12 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h"
+ 577              		.file 13 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h"
+ 578              		.file 14 "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h"
+ 579              		.file 15 "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h"
+ 580              		.file 16 "Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h"
+ 581              		.file 17 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
+ 582              		.file 18 "Core/Inc/spi.h"
+ 583              		.file 19 "Core/Inc/usart.h"
+ 584              		.file 20 "D:\\stm32cubeclt\\STM32CubeCLT_1.21.0\\GNU-tools-for-STM32\\bin\\../lib/gcc/arm-none-eab
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 16
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 freertos.c
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:21     .text.StartDefaultTask:00000000 $t
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:27     .text.StartDefaultTask:00000000 StartDefaultTask
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:54     .text.vApplicationGetIdleTaskMemory:00000000 $t
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:60     .text.vApplicationGetIdleTaskMemory:00000000 vApplicationGetIdleTaskMemory
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:85     .text.vApplicationGetIdleTaskMemory:00000010 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:478    .bss.xIdleTaskTCBBuffer:00000000 xIdleTaskTCBBuffer
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:472    .bss.xIdleStack:00000000 xIdleStack
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:91     .text.MX_FREERTOS_Init:00000000 $t
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:97     .text.MX_FREERTOS_Init:00000000 MX_FREERTOS_Init
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:205    .text.MX_FREERTOS_Init:000000a4 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:532    .bss.spiMutexHandle:00000000 spiMutexHandle
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:525    .bss.txDoneSemHandle:00000000 txDoneSemHandle
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:485    .bss.defaultTaskHandle:00000000 defaultTaskHandle
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:511    .bss.spiTxTaskHandle:00000000 spiTxTaskHandle
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:504    .bss.spiRxTaskHandle:00000000 spiRxTaskHandle
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:518    .bss.spiEventHandle:00000000 spiEventHandle
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:216    .text.UART_Log:00000000 $t
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:222    .text.UART_Log:00000000 UART_Log
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:254    .text.UART_Log:00000018 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:259    .rodata.SpiTxTask.str1.4:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:263    .text.SpiTxTask:00000000 $t
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:269    .text.SpiTxTask:00000000 SpiTxTask
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:350    .text.SpiTxTask:0000006c $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:491    .bss.rx_buf:00000000 rx_buf
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:497    .data.tx_buf:00000000 tx_buf
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:362    .rodata.SpiRxTask.str1.4:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:375    .text.SpiRxTask:00000000 $t
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:381    .text.SpiRxTask:00000000 SpiRxTask
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:448    .text.SpiRxTask:0000004c $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:459    .rodata.str1.4:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:469    .bss.xIdleStack:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:475    .bss.xIdleTaskTCBBuffer:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:482    .bss.defaultTaskHandle:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:488    .bss.rx_buf:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:494    .data.tx_buf:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:501    .bss.spiRxTaskHandle:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:508    .bss.spiTxTaskHandle:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:515    .bss.spiEventHandle:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:522    .bss.txDoneSemHandle:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:529    .bss.spiMutexHandle:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s:535    .rodata:00000000 $d
+
+UNDEFINED SYMBOLS
+osDelay
+osMutexCreate
+osSemaphoreCreate
+osSemaphoreWait
+osThreadCreate
+xEventGroupCreate
+strlen
+HAL_UART_Transmit
+huart5
+osMutexWait
+HAL_GPIO_WritePin
+HAL_SPI_TransmitReceive
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccObvfS4.s 			page 17
+
+
+xEventGroupSetBits
+osMutexRelease
+osSemaphoreRelease
+hspi1
+strncmp
