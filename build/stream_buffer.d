@@ -1,5 +1,6 @@
 build/stream_buffer.o: \
  Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c \
+ Host/Port/include/ctrl_core_fix.h \
  Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
  Core/Inc/FreeRTOSConfig.h \
  Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
@@ -10,6 +11,7 @@ build/stream_buffer.o: \
  Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
  Middlewares/Third_Party/FreeRTOS/Source/include/stream_buffer.h
+Host/Port/include/ctrl_core_fix.h:
 Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 Core/Inc/FreeRTOSConfig.h:
 Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:

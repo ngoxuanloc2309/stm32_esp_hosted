@@ -14,10 +14,13 @@ $(HOST_ESP_DIR)/stm32/common/common.c \
 $(HOST_ESP_DIR)/stm32/common/util.c \
 $(HOST_ESP_DIR)/stm32/common/stats.c \
 $(HOST_ESP_DIR)/control_lib/src/ctrl_api.c \
-$(HOST_ESP_DIR)/control_lib/src/ctrl_core.c \
+$(HOST_DIR)/Components/trans_spi/src/ctrl_core_wrapper.c \
 $(HOST_ESP_DIR)/stm32/driver/transport/transport_drv.c \
 $(HOST_ESP_DIR)/stm32/virtual_serial_if/src/serial_ll_if.c \
-$(HOST_ESP_DIR)/stm32/netif/src/netdev_if.c
+$(HOST_ESP_DIR)/stm32/netif/src/netdev_if.c \
+$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host/stm32/driver/serial/serial_ll_if.c 
+
+#$(HOST_ESP_DIR)/control_lib/src/ctrl_core.c \
 
 HOST_ESP_INCLUDES = \
 -I$(HOST_ESP_DIR)/stm32/common \
@@ -27,7 +30,11 @@ HOST_ESP_INCLUDES = \
 -I$(HOST_ESP_DIR)/stm32/virtual_serial_if/include \
 -I$(HOST_ESP_DIR)/control_lib/include \
 -I$(HOST_ESP_DIR)/control_lib/src/include \
--I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/esp/esp_driver/network_adapter/main
+-I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/esp/esp_driver/network_adapter/main \
+-I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/common/include \
+-I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host/virtual_serial_if/include \
+-I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host/components/include \
+-I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host/stm32/driver/serial
 
 # -------------------------------------------------------
 # Protobuf
@@ -98,3 +105,6 @@ $(PORT_INCLUDES) \
 $(COMPONENTS_INCLUDES) \
 $(SERVICES_INCLUDES) \
 $(APP_INCLUDES)
+
+HOST_CFLAGS = -DMCU_SYS \
+    -include Host/Port/include/ctrl_core_fix.h

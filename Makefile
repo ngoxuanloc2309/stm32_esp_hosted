@@ -24,6 +24,8 @@ DEBUG = 1
 # optimization
 OPT = -Og
 
+include Host/host.mk
+
 
 #######################################
 # paths
@@ -75,6 +77,8 @@ Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c \
 Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c \
 Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c
 
+C_SOURCES += $(HOST_SOURCES)
+
 # ASM sources
 ASM_SOURCES =  \
 startup_stm32f407xx.s
@@ -107,6 +111,7 @@ BIN = $(CP) -O binary -S
 #######################################
 # CFLAGS
 #######################################
+CFLAGS += $(HOST_CFLAGS)
 # cpu
 CPU = -mcpu=cortex-m4
 
@@ -143,6 +148,7 @@ C_INCLUDES =  \
 -IMiddlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS \
 -IMiddlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
 
+CFLAGS += $(HOST_INCLUDES)
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections

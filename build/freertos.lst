@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
   28:Core/Src/freertos.c **** /* Private macro -------------------------------------------------------------*/
   29:Core/Src/freertos.c **** /* USER CODE BEGIN PM */
   30:Core/Src/freertos.c **** 
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 2
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 2
 
 
   31:Core/Src/freertos.c **** /* USER CODE END PM */
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
   85:Core/Src/freertos.c **** 
   86:Core/Src/freertos.c ****   /* USER CODE END Init */
   87:Core/Src/freertos.c **** 
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 3
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 3
 
 
   88:Core/Src/freertos.c ****   /* USER CODE BEGIN RTOS_MUTEX */
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
   35              		.loc 1 135 1 is_stmt 0 view .LVU1
   36 0000 08B5     		push	{r3, lr}
   37              	.LCFI0:
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 4
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 4
 
 
   38              		.cfi_def_cfa_offset 8
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
   80              		.loc 1 75 1 view .LVU12
   81 000e 7047     		bx	lr
   82              	.L6:
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 5
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 5
 
 
   83              		.align	2
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
  131 001c FFF7FEFF 		bl	osSemaphoreCreate
  132              	.LVL5:
   97:Core/Src/freertos.c ****   osSemaphoreWait(txDoneSemHandle, osWaitForever); // init count = 0
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 6
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 6
 
 
  133              		.loc 1 97 19 discriminator 1 view .LVU21
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
  177 0080 AEE80F00 		stmia	lr!, {r0, r1, r2, r3}
  178 0084 9CE80700 		ldm	ip, {r0, r1, r2}
  179 0088 8EE80700 		stm	lr, {r0, r1, r2}
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 7
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 7
 
 
  120:Core/Src/freertos.c **** 
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
  145:Core/Src/freertos.c **** /* Private application code --------------------------------------------------*/
  146:Core/Src/freertos.c **** /* USER CODE BEGIN Application */
  147:Core/Src/freertos.c **** void UART_Log(const char *msg)
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 8
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 8
 
 
  148:Core/Src/freertos.c **** {
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
  271              		.loc 1 153 1 is_stmt 1 view -0
  272              		.cfi_startproc
  273              		@ Volatile: function does not return.
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 9
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 9
 
 
  274              		@ args = 0, pretend = 0, frame = 0
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
  320 003e FFF7FEFF 		bl	HAL_GPIO_WritePin
  321              	.LVL20:
  162:Core/Src/freertos.c **** 
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 10
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 10
 
 
  163:Core/Src/freertos.c ****         UART_Log("STM32 sent: Hello ESP32\r\n");
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
  366              	.LC11:
  367 0008 53544D33 		.ascii	"STM32 received: \000"
  367      32207265 
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 11
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 11
 
 
  367      63656976 
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
  404 000c FFF7FEFF 		bl	UART_Log
  405              	.LVL29:
  184:Core/Src/freertos.c ****             UART_Log("\r\n");
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 12
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 12
 
 
  406              		.loc 1 184 13 view .LVU64
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
  451 0058 00000000 		.word	spiEventHandle
  452 005c 00000000 		.word	txDoneSemHandle
  453 0060 00000000 		.word	.LC10
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 13
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 13
 
 
  454 0064 20000000 		.word	.LC13
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
  493              	.LVL37:
  494              	.L28:
  198:Core/Src/freertos.c ****         UART_Log("EXTI PB0 triggered\r\n");
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 14
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 14
 
 
  199:Core/Src/freertos.c ****     }
@@ -838,7 +838,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
  539      00000000 
  539      00000000 
  539      00000000 
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 15
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 15
 
 
  539      00000000 
@@ -898,7 +898,7 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
  602              		.set	.LANCHOR0,. + 0
  603              	.LC6:
  604 0000 18000000 		.word	.LC0
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 16
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 16
 
 
  605 0004 00000000 		.word	StartDefaultTask
@@ -947,56 +947,56 @@ ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 1
  648              		.file 18 "Core/Inc/spi.h"
  649              		.file 19 "Core/Inc/usart.h"
  650              		.file 20 "D:\\stm32cubeclt\\STM32CubeCLT_1.21.0\\GNU-tools-for-STM32\\bin\\../lib/gcc/arm-none-eab
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 17
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 17
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 freertos.c
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:21     .text.StartDefaultTask:00000000 $t
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:27     .text.StartDefaultTask:00000000 StartDefaultTask
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:54     .text.vApplicationGetIdleTaskMemory:00000000 $t
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:60     .text.vApplicationGetIdleTaskMemory:00000000 vApplicationGetIdleTaskMemory
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:85     .text.vApplicationGetIdleTaskMemory:00000010 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:544    .bss.xIdleTaskTCBBuffer:00000000 xIdleTaskTCBBuffer
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:538    .bss.xIdleStack:00000000 xIdleStack
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:91     .text.MX_FREERTOS_Init:00000000 $t
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:97     .text.MX_FREERTOS_Init:00000000 MX_FREERTOS_Init
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:205    .text.MX_FREERTOS_Init:000000a4 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:598    .bss.spiMutexHandle:00000000 spiMutexHandle
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:591    .bss.txDoneSemHandle:00000000 txDoneSemHandle
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:551    .bss.defaultTaskHandle:00000000 defaultTaskHandle
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:577    .bss.spiTxTaskHandle:00000000 spiTxTaskHandle
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:570    .bss.spiRxTaskHandle:00000000 spiRxTaskHandle
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:584    .bss.spiEventHandle:00000000 spiEventHandle
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:216    .text.UART_Log:00000000 $t
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:222    .text.UART_Log:00000000 UART_Log
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:254    .text.UART_Log:00000018 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:259    .rodata.SpiTxTask.str1.4:00000000 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:263    .text.SpiTxTask:00000000 $t
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:269    .text.SpiTxTask:00000000 SpiTxTask
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:350    .text.SpiTxTask:0000006c $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:557    .bss.rx_buf:00000000 rx_buf
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:563    .data.tx_buf:00000000 tx_buf
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:362    .rodata.SpiRxTask.str1.4:00000000 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:375    .text.SpiRxTask:00000000 $t
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:381    .text.SpiRxTask:00000000 SpiRxTask
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:448    .text.SpiRxTask:0000004c $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:459    .rodata.HAL_GPIO_EXTI_Callback.str1.4:00000000 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:466    .text.HAL_GPIO_EXTI_Callback:00000000 $t
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:472    .text.HAL_GPIO_EXTI_Callback:00000000 HAL_GPIO_EXTI_Callback
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:519    .text.HAL_GPIO_EXTI_Callback:0000001c $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:525    .rodata.str1.4:00000000 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:535    .bss.xIdleStack:00000000 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:541    .bss.xIdleTaskTCBBuffer:00000000 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:548    .bss.defaultTaskHandle:00000000 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:554    .bss.rx_buf:00000000 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:560    .data.tx_buf:00000000 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:567    .bss.spiRxTaskHandle:00000000 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:574    .bss.spiTxTaskHandle:00000000 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:581    .bss.spiEventHandle:00000000 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:588    .bss.txDoneSemHandle:00000000 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:595    .bss.spiMutexHandle:00000000 $d
-C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s:601    .rodata:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:21     .text.StartDefaultTask:00000000 $t
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:27     .text.StartDefaultTask:00000000 StartDefaultTask
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:54     .text.vApplicationGetIdleTaskMemory:00000000 $t
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:60     .text.vApplicationGetIdleTaskMemory:00000000 vApplicationGetIdleTaskMemory
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:85     .text.vApplicationGetIdleTaskMemory:00000010 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:544    .bss.xIdleTaskTCBBuffer:00000000 xIdleTaskTCBBuffer
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:538    .bss.xIdleStack:00000000 xIdleStack
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:91     .text.MX_FREERTOS_Init:00000000 $t
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:97     .text.MX_FREERTOS_Init:00000000 MX_FREERTOS_Init
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:205    .text.MX_FREERTOS_Init:000000a4 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:598    .bss.spiMutexHandle:00000000 spiMutexHandle
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:591    .bss.txDoneSemHandle:00000000 txDoneSemHandle
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:551    .bss.defaultTaskHandle:00000000 defaultTaskHandle
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:577    .bss.spiTxTaskHandle:00000000 spiTxTaskHandle
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:570    .bss.spiRxTaskHandle:00000000 spiRxTaskHandle
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:584    .bss.spiEventHandle:00000000 spiEventHandle
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:216    .text.UART_Log:00000000 $t
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:222    .text.UART_Log:00000000 UART_Log
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:254    .text.UART_Log:00000018 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:259    .rodata.SpiTxTask.str1.4:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:263    .text.SpiTxTask:00000000 $t
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:269    .text.SpiTxTask:00000000 SpiTxTask
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:350    .text.SpiTxTask:0000006c $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:557    .bss.rx_buf:00000000 rx_buf
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:563    .data.tx_buf:00000000 tx_buf
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:362    .rodata.SpiRxTask.str1.4:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:375    .text.SpiRxTask:00000000 $t
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:381    .text.SpiRxTask:00000000 SpiRxTask
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:448    .text.SpiRxTask:0000004c $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:459    .rodata.HAL_GPIO_EXTI_Callback.str1.4:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:466    .text.HAL_GPIO_EXTI_Callback:00000000 $t
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:472    .text.HAL_GPIO_EXTI_Callback:00000000 HAL_GPIO_EXTI_Callback
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:519    .text.HAL_GPIO_EXTI_Callback:0000001c $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:525    .rodata.str1.4:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:535    .bss.xIdleStack:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:541    .bss.xIdleTaskTCBBuffer:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:548    .bss.defaultTaskHandle:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:554    .bss.rx_buf:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:560    .data.tx_buf:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:567    .bss.spiRxTaskHandle:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:574    .bss.spiTxTaskHandle:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:581    .bss.spiEventHandle:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:588    .bss.txDoneSemHandle:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:595    .bss.spiMutexHandle:00000000 $d
+C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s:601    .rodata:00000000 $d
 
 UNDEFINED SYMBOLS
 osDelay
@@ -1007,7 +1007,7 @@ osThreadCreate
 xEventGroupCreate
 strlen
 HAL_UART_Transmit
-ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccuThpkd.s 			page 18
+ARM GAS  C:\Users\DELL\AppData\Local\Temp\ccrpqdxa.s 			page 18
 
 
 huart5

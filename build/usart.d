@@ -1,4 +1,5 @@
-build/usart.o: Core/Src/usart.c Core/Inc/usart.h Core/Inc/main.h \
+build/usart.o: Core/Src/usart.c Host/Port/include/ctrl_core_fix.h \
+ Core/Inc/usart.h Core/Inc/main.h \
  Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  Core/Inc/stm32f4xx_hal_conf.h \
  Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -26,6 +27,7 @@ build/usart.o: Core/Src/usart.c Core/Inc/usart.h Core/Inc/main.h \
  Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
+Host/Port/include/ctrl_core_fix.h:
 Core/Inc/usart.h:
 Core/Inc/main.h:
 Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:

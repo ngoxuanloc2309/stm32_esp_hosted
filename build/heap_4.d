@@ -1,5 +1,6 @@
 build/heap_4.o: \
  Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c \
+ Host/Port/include/ctrl_core_fix.h \
  Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
  Core/Inc/FreeRTOSConfig.h \
  Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
@@ -9,6 +10,7 @@ build/heap_4.o: \
  Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
  Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
  Middlewares/Third_Party/FreeRTOS/Source/include/list.h
+Host/Port/include/ctrl_core_fix.h:
 Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
 Core/Inc/FreeRTOSConfig.h:
 Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
