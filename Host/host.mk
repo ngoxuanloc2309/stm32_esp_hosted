@@ -26,7 +26,8 @@ HOST_ESP_INCLUDES = \
 -I$(HOST_ESP_DIR)/control_lib/include \
 -I$(HOST_ESP_DIR)/control_lib/src/include \
 -I$(HOST_ESP_DIR)/components/include \
--I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/common/include
+-I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/common/include \
+-I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host/virtual_serial_if/include
 
 # -------------------------------------------------------
 # Protobuf
