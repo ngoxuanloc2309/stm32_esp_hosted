@@ -129,7 +129,19 @@ unsigned int sleep(unsigned int seconds)  { osDelay(seconds * 1000); return 0; }
 unsigned int msleep(unsigned int mseconds) { osDelay(mseconds); return 0; }
 
 /* --- Control Path Platform --- */
-int control_path_platform_init(void)
+// int control_path_platform_init(void)
+// {
+//     osSemaphoreDef(READSEM);
+//     readSemaphore = osSemaphoreCreate(osSemaphore(READSEM), 1);
+//     if (!readSemaphore) return -1;
+//     if (osSemaphoreWait(readSemaphore, portMAX_DELAY) != osOK) return -1;
+//     serial_ll_if_g = serial_ll_init(control_path_rx_indication);
+//     if (!serial_ll_if_g) return -1;
+//     if (serial_ll_if_g->fops->open(serial_ll_if_g) != 0) return -1;
+//     return 0;
+// }
+
+int control_path_platform_init(struct serial_drv_handle_t *serial_drv_handle)
 {
     osSemaphoreDef(READSEM);
     readSemaphore = osSemaphoreCreate(osSemaphore(READSEM), 1);
