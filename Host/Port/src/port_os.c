@@ -11,6 +11,10 @@
 static osSemaphoreId readSemaphore;
 static serial_ll_handle_t *serial_ll_if_g;
 
+struct timer_handle_t {
+    osTimerId timer_id;
+};
+
 static void control_path_rx_indication(void)
 {
     if (readSemaphore)

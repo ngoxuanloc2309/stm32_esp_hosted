@@ -3,52 +3,42 @@
 # -------------------------------------------------------
 
 HOST_DIR = Host
-
-# -------------------------------------------------------
-# ESP-Hosted-FG library paths
-# -------------------------------------------------------
 HOST_ESP_DIR = $(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host
 
+# -------------------------------------------------------
+# ESP-Hosted-FG files
+# -------------------------------------------------------
 HOST_ESP_FILES = \
 $(HOST_ESP_DIR)/stm32/common/common.c \
 $(HOST_ESP_DIR)/stm32/common/util.c \
 $(HOST_ESP_DIR)/stm32/common/stats.c \
 $(HOST_ESP_DIR)/control_lib/src/ctrl_api.c \
-$(HOST_DIR)/Components/trans_spi/src/ctrl_core_wrapper.c \
-$(HOST_ESP_DIR)/stm32/driver/transport/transport_drv.c \
-$(HOST_ESP_DIR)/stm32/virtual_serial_if/src/serial_ll_if.c \
-$(HOST_ESP_DIR)/stm32/netif/src/netdev_if.c \
-$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host/stm32/driver/serial/serial_ll_if.c \
-$(HOST_DIR)/Components/trans_spi/src/netdev_if.c
-
-#$(HOST_ESP_DIR)/control_lib/src/ctrl_core.c \
+$(HOST_ESP_DIR)/stm32/driver/serial/serial_ll_if.c
 
 HOST_ESP_INCLUDES = \
 -I$(HOST_ESP_DIR)/stm32/common \
 -I$(HOST_ESP_DIR)/stm32/port/include \
 -I$(HOST_ESP_DIR)/stm32/driver/transport \
 -I$(HOST_ESP_DIR)/stm32/driver/netif \
+-I$(HOST_ESP_DIR)/stm32/driver/serial \
 -I$(HOST_ESP_DIR)/stm32/virtual_serial_if/include \
+-I$(HOST_ESP_DIR)/stm32/app/control \
 -I$(HOST_ESP_DIR)/control_lib/include \
 -I$(HOST_ESP_DIR)/control_lib/src/include \
--I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/esp/esp_driver/network_adapter/main \
--I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/common/include \
--I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host/virtual_serial_if/include \
--I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host/components/include \
--I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host/stm32/driver/serial
+-I$(HOST_ESP_DIR)/components/include \
+-I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/common/include
 
 # -------------------------------------------------------
 # Protobuf
 # -------------------------------------------------------
-HOST_PROTO_DIR = $(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host/linux/port/src
-
 HOST_PROTO_FILES = \
-$(HOST_ESP_DIR)/../common/protobuf-c/protobuf-c.c \
-$(HOST_ESP_DIR)/../common/esp_hosted_config.pb-c.c
+$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/common/protobuf-c/protobuf-c/protobuf-c.c \
+$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/common/esp_hosted_config.pb-c.c
 
 HOST_PROTO_INCLUDES = \
--I$(HOST_ESP_DIR)/../common \
--I$(HOST_ESP_DIR)/../common/protobuf-c
+-I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/common/protobuf-c \
+-I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/common/protobuf-c/protobuf-c \
+-I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/common
 
 # -------------------------------------------------------
 # Port
@@ -66,8 +56,10 @@ PORT_INCLUDES = \
 # Components
 # -------------------------------------------------------
 COMPONENTS_FILES = \
+$(HOST_DIR)/Components/trans_spi/src/ctrl_core_wrapper.c \
+$(HOST_DIR)/Components/trans_spi/src/transport_drv.c \
 $(HOST_DIR)/Components/trans_spi/src/spi_drv.c \
-$(HOST_DIR)/Components/trans_spi/src/transport_drv.c
+$(HOST_DIR)/Components/trans_spi/src/netdev_if.c
 
 COMPONENTS_INCLUDES = \
 -I$(HOST_DIR)/Components/trans_spi/include
@@ -107,5 +99,4 @@ $(COMPONENTS_INCLUDES) \
 $(SERVICES_INCLUDES) \
 $(APP_INCLUDES)
 
-HOST_CFLAGS = -DMCU_SYS \
-    -include Host/Port/include/ctrl_core_fix.h
+HOST_CFLAGS = -DMCU_SYS

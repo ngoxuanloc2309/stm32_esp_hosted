@@ -5,6 +5,7 @@
 #include "trace.h"
 #include "app.h"
 #include "app_config.h"
+#include "control.h"
 
 static osThreadId app_task_id = 0;
 static volatile uint8_t transport_active = 0;

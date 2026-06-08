@@ -5,5 +5,5 @@
 #define USR_SPI_CS_GPIO_Port    GPIOA
 #define USR_SPI_CS_Pin          GPIO_PIN_4
 
-#define UART_LOG                &huart5
-#define USER_SPI                &hspi1
+#define UART_LOG                (&huart5)
+#define USER_SPI                (&hspi1)
