@@ -2,7 +2,6 @@
 #include <string.h>
 #include "cmsis_os.h"
 #include "platform_wrapper.h"
-#include "serial_if.h"
 #include "serial_ll_if.h"
 #include "port_log.h"
 
