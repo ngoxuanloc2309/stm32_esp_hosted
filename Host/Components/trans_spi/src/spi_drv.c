@@ -133,8 +133,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 static stm_ret_t spi_transaction_v2(uint8_t *txbuff)
 {
+    uint32_t heap_before = xPortGetFreeHeapSize();
     printf("spi_tx_v2 ENTER\r\n");
-    printf("SPI_TX: heap=%d\r\n", xPortGetFreeHeapSize());
+    printf("SPI_TX: heap=%d\r\n", heap_before);
     uint8_t *rxbuff = NULL;
     uint8_t txbuff_allocated = 0;
     interface_buffer_handle_t buf_handle = {0};
@@ -222,6 +223,9 @@ static stm_ret_t spi_transaction_v2(uint8_t *txbuff)
 
     printf("queued to from_slave OK\r\n");
 
+    uint32_t heap_after = xPortGetFreeHeapSize();
+    printf("SPI_TRANS EXIT: heap_before=%d, heap_after=%d, diff=%d\r\n", 
+           heap_before, heap_after, (int)heap_before - (int)heap_after);
     return STM_OK;
 }
 
@@ -239,6 +243,8 @@ static void check_and_execute_spi_transaction(void)
             if (txbuff) free(txbuff);
             return;
         }
+        // GPIO pins ready but no TX data - still need to handle RX
+        // Don't free txbuff yet, will be freed at end
     }
 
     if (is_valid_tx_buf) {
@@ -346,6 +352,9 @@ static void process_rx_task(void const *pvParameters)
                 assert(buffer->payload);
                 memcpy(buffer->payload, buf_handle.payload, buf_handle.payload_len);
                 netdev_rx(priv->netdev, buffer);
+                // Free the pbuf struct (payload might be managed by netdev)
+                free(buffer);
+                buffer = NULL;
             }
 
         } else if (buf_handle.if_type == ESP_PRIV_IF) {
@@ -363,6 +372,13 @@ static void process_rx_task(void const *pvParameters)
                 if (spi_drv_evt_handler_fp)
                     spi_drv_evt_handler_fp(TRANSPORT_ACTIVE);
             }
+            // Free the pbuf struct and payload after processing
+            // if (buffer) {
+            //     if (buffer->payload)
+            //         free(buffer->payload);
+            //     free(buffer);
+            //     buffer = NULL;
+            // }
         }
 
         if (buf_handle.free_buf_handle)

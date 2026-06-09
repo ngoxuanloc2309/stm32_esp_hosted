@@ -48,16 +48,51 @@ int serial_drv_write(struct serial_drv_handle_t *handle,
     return ret;
 }
 
+// uint8_t* serial_drv_read(struct serial_drv_handle_t *handle,
+//                          uint32_t *out_nbyte)
+// {
+//     if (!handle || !handle->ll_handle) return NULL;
+
+//     printf("serial_drv_read: waiting for data...\r\n");
+//     uint16_t rlen = 0;
+//     uint8_t *buf = handle->ll_handle->fops->read(handle->ll_handle, &rlen);
+//     printf("serial_drv_read: fops->read returned rlen=%d\r\n", rlen);
+
+//     if (!buf || !rlen) {
+//         if (out_nbyte) *out_nbyte = 0;
+//         return NULL;
+//     }
+
+//     uint32_t proto_len = 0;
+//     if (parse_tlv(buf, &proto_len) != 0) {
+//         printf("serial_drv_read: TLV parse failed\r\n");
+//         if (out_nbyte) *out_nbyte = 0;
+//         return NULL;
+//     }
+
+//     char *ep_name = CTRL_EP_NAME_RESP;
+//     uint32_t offset = 1 + 2 + strlen(ep_name) + 1 + 2;
+
+//     printf("serial_drv_read: proto_len=%lu offset=%lu\r\n", proto_len, offset);
+
+//     // Alloc new buffer để caller có thể free an toàn
+//     uint8_t *proto_buf = hosted_malloc(proto_len);
+//     if (!proto_buf) {
+//         if (out_nbyte) *out_nbyte = 0;
+//         return NULL;
+//     }
+//     memcpy(proto_buf, buf + offset, proto_len);
+
+//     if (out_nbyte) *out_nbyte = proto_len;
+//     return proto_buf;
+// }
+
 uint8_t* serial_drv_read(struct serial_drv_handle_t *handle,
                          uint32_t *out_nbyte)
 {
     if (!handle || !handle->ll_handle) return NULL;
-
-    printf("serial_drv_read: waiting for data...\r\n");
     uint16_t rlen = 0;
     uint8_t *buf = handle->ll_handle->fops->read(handle->ll_handle, &rlen);
-    printf("serial_drv_read: fops->read returned rlen=%d\r\n", rlen);
-
     if (!buf || !rlen) {
         if (out_nbyte) *out_nbyte = 0;
         return NULL;
@@ -65,23 +100,22 @@ uint8_t* serial_drv_read(struct serial_drv_handle_t *handle,
 
     uint32_t proto_len = 0;
     if (parse_tlv(buf, &proto_len) != 0) {
-        printf("serial_drv_read: TLV parse failed\r\n");
         if (out_nbyte) *out_nbyte = 0;
+        hosted_free(buf);  
         return NULL;
     }
 
     char *ep_name = CTRL_EP_NAME_RESP;
     uint32_t offset = 1 + 2 + strlen(ep_name) + 1 + 2;
 
-    printf("serial_drv_read: proto_len=%lu offset=%lu\r\n", proto_len, offset);
-
-    // Alloc new buffer để caller có thể free an toàn
     uint8_t *proto_buf = hosted_malloc(proto_len);
     if (!proto_buf) {
+        hosted_free(buf);
         if (out_nbyte) *out_nbyte = 0;
         return NULL;
     }
     memcpy(proto_buf, buf + offset, proto_len);
+    hosted_free(buf);  
 
     if (out_nbyte) *out_nbyte = proto_len;
     return proto_buf;
