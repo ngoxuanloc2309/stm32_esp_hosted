@@ -7,3 +7,9 @@ void port_log_write(const char *msg)
 {
     HAL_UART_Transmit(UART_LOG, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
 }
+
+int __io_putchar(int ch)
+{
+    HAL_UART_Transmit(UART_LOG, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+    return ch;
+}

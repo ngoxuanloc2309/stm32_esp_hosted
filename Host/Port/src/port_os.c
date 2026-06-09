@@ -8,13 +8,13 @@
 #define SEC_TO_MILLISEC(x) (1000*(x))
 
 static osSemaphoreId readSemaphore;
-static serial_ll_handle_t *serial_ll_if_g;
+serial_ll_handle_t *serial_ll_if_g;
 
 struct timer_handle_t {
     osTimerId timer_id;
 };
 
-static void control_path_rx_indication(void)
+void control_path_rx_indication(void)
 {
     if (readSemaphore)
         osSemaphoreRelease(readSemaphore);
@@ -41,14 +41,36 @@ void *hosted_realloc(void *mem, size_t newsize)
 }
 
 /* --- Threads --- */
+// void *hosted_thread_create(void (*start_routine)(void const *), void *arg)
+// {
+//     if (!start_routine) return NULL;
+//     thread_handle_t *h = hosted_malloc(sizeof(thread_handle_t));
+//     if (!h) return NULL;
+//     osThreadDef(Ctrl_port_tsk, start_routine, CTRL_PATH_TASK_PRIO, 0, CTRL_PATH_TASK_STACK_SIZE);
+//     *h = osThreadCreate(osThread(Ctrl_port_tsk), arg);
+//     if (!(*h)) { mem_free(h); return NULL; }
+//     return h;
+// }
+
 void *hosted_thread_create(void (*start_routine)(void const *), void *arg)
 {
     if (!start_routine) return NULL;
     thread_handle_t *h = hosted_malloc(sizeof(thread_handle_t));
     if (!h) return NULL;
-    osThreadDef(Ctrl_port_tsk, start_routine, CTRL_PATH_TASK_PRIO, 0, CTRL_PATH_TASK_STACK_SIZE);
-    *h = osThreadCreate(osThread(Ctrl_port_tsk), arg);
-    if (!(*h)) { mem_free(h); return NULL; }
+
+    BaseType_t ret = xTaskCreate(
+        (TaskFunction_t)start_routine,
+        "ctrl_task",
+        CTRL_PATH_TASK_STACK_SIZE,
+        arg,
+        CTRL_PATH_TASK_PRIO,
+        h
+    );
+
+    if (ret != pdPASS) {
+        hosted_free(h);
+        return NULL;
+    }
     return h;
 }
 
@@ -129,7 +151,8 @@ unsigned int sleep(unsigned int seconds)  { osDelay(seconds * 1000); return 0; }
 unsigned int msleep(unsigned int mseconds) { osDelay(mseconds); return 0; }
 
 /* --- Control Path Platform --- */
-// int control_path_platform_init(void)
+
+// int control_path_platform_init(struct serial_drv_handle_t *serial_drv_handle)
 // {
 //     osSemaphoreDef(READSEM);
 //     readSemaphore = osSemaphoreCreate(osSemaphore(READSEM), 1);
@@ -147,9 +170,6 @@ int control_path_platform_init(struct serial_drv_handle_t *serial_drv_handle)
     readSemaphore = osSemaphoreCreate(osSemaphore(READSEM), 1);
     if (!readSemaphore) return -1;
     if (osSemaphoreWait(readSemaphore, portMAX_DELAY) != osOK) return -1;
-    serial_ll_if_g = serial_ll_init(control_path_rx_indication);
-    if (!serial_ll_if_g) return -1;
-    if (serial_ll_if_g->fops->open(serial_ll_if_g) != 0) return -1;
     return 0;
 }
 

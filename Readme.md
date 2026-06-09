@@ -7,3 +7,7 @@ In the location: Host/libs/esp-hosted/esp_hosted_fg/host/stm32/port/include/plat
 
 2.  Change from: int control_path_platform_init(void);
     To: int control_path_platform_init(struct serial_drv_handle_t *serial_drv_handle);
+
+In the location: Host/libs/esp-hosted/esp_hosted_fg/host/virtual_serial_if/src/serial_if.c (line 193)
+
+3. Clear: "mem_free(write_buf);"
