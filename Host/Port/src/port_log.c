@@ -1,3 +1,4 @@
+/*port_log.c*/
 #include <stdio.h>
 #include <string.h>
 #include "port_log.h"

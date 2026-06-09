@@ -1,3 +1,4 @@
+/*spi_drv.c*/
 #include "cmsis_os.h"
 #include "string.h"
 #include "spi.h"
@@ -12,8 +13,8 @@
 
 #define TO_SLAVE_QUEUE_SIZE         10
 #define FROM_SLAVE_QUEUE_SIZE       10
-#define TRANSACTION_TASK_STACK_SIZE 8192
-#define PROCESS_RX_TASK_STACK_SIZE  8192
+#define TRANSACTION_TASK_STACK_SIZE 4096
+#define PROCESS_RX_TASK_STACK_SIZE  4096
 #define MAX_PAYLOAD_SIZE            (MAX_SPI_BUFFER_SIZE - sizeof(struct esp_payload_header))
 
 static uint8_t first_trans = 1;
@@ -163,13 +164,9 @@ static stm_ret_t spi_transaction_v2(uint8_t *txbuff)
         memset(txbuff, 0, MAX_SPI_BUFFER_SIZE);
         txbuff_allocated = 1;
     }
-    printf("first_trans=%d\r\n", first_trans);
     if (first_trans)
         osDelay(10);
 
-    printf("SPI: HS=%d DR=%d\r\n",
-            HAL_GPIO_ReadPin(GPIO_HANDSHAKE_PORT, GPIO_HANDSHAKE_PIN),
-            HAL_GPIO_ReadPin(GPIO_DATA_READY_PORT, GPIO_DATA_READY_PIN));
     HAL_GPIO_WritePin(USR_SPI_CS_GPIO_Port, USR_SPI_CS_Pin, GPIO_PIN_RESET);
     HAL_Delay(10);
     printf("CS LOW - starting transfer\r\n");
@@ -234,7 +231,6 @@ static void check_and_execute_spi_transaction(void)
     uint8_t is_valid_tx_buf = 0;
 
     txbuff = get_tx_buffer(&is_valid_tx_buf);
-    printf("check_exec: is_valid=%d txbuff=%p\r\n", is_valid_tx_buf, txbuff);
 
     if (!is_valid_tx_buf) {
         GPIO_PinState hs = HAL_GPIO_ReadPin(GPIO_HANDSHAKE_PORT, GPIO_HANDSHAKE_PIN);
@@ -258,12 +254,12 @@ static void check_and_execute_spi_transaction(void)
         printf("check_exec: HS ready, calling SPI\r\n");
     }
 
-    printf("check_exec: taking mutex\r\n");
+    // printf("check_exec: taking mutex\r\n");
     xSemaphoreTake(mutex_spi_trans, portMAX_DELAY);
-    printf("check_exec: got mutex\r\n");
+    // printf("check_exec: got mutex\r\n");
     spi_transaction_v2(txbuff);
     xSemaphoreGive(mutex_spi_trans);
-    printf("check_exec: gave mutex\r\n");
+    // printf("check_exec: gave mutex\r\n");
     if (txbuff) { free(txbuff); txbuff = NULL; }
 }
 
@@ -291,8 +287,8 @@ stm_ret_t send_to_slave(uint8_t iface_type, uint8_t iface_num,
         return STM_FAIL;
     }
 
-    printf("send_to_slave: queued if_type=%d len=%d waiting=%d\r\n", 
-    iface_type, wlen, (int)uxQueueMessagesWaiting(to_slave_queue));
+    // printf("send_to_slave: queued if_type=%d len=%d waiting=%d\r\n", 
+    // iface_type, wlen, (int)uxQueueMessagesWaiting(to_slave_queue));
 
     xSemaphoreGive(spi_sem);
     return STM_OK;
@@ -302,12 +298,11 @@ static void transaction_task(void const *pvParameters)
 {
     printf("transaction_task started\r\n");
     for (;;) {
-        printf("TT: waiting\r\n");
+        // printf("TT: waiting\r\n");
         xSemaphoreTake(spi_sem, pdMS_TO_TICKS(100));
-        printf("TT: woke\r\n");
+        // printf("TT: woke\r\n");
         check_and_execute_spi_transaction();
 
-        /* Poll thêm tối đa 500ms để nhận response */
         uint32_t tick = HAL_GetTick();
         while (HAL_GetTick() - tick < 2000) {
             GPIO_PinState hs = HAL_GPIO_ReadPin(GPIO_HANDSHAKE_PORT, GPIO_HANDSHAKE_PIN);
@@ -319,7 +314,7 @@ static void transaction_task(void const *pvParameters)
             }
             osDelay(1);
         }
-        printf("TT: poll done elapsed=%lu\r\n", HAL_GetTick() - tick);
+        // printf("TT: poll done elapsed=%lu\r\n", HAL_GetTick() - tick);
     }
 }
 
@@ -336,7 +331,7 @@ static void process_rx_task(void const *pvParameters)
         if (pdTRUE != xQueueReceive(from_slave_queue, &buf_handle, portMAX_DELAY))
             continue;
 
-        printf("RX: if_type=%d len=%d\r\n", buf_handle.if_type, buf_handle.payload_len);
+        // printf("RX: if_type=%d len=%d\r\n", buf_handle.if_type, buf_handle.payload_len);
 
         if (buf_handle.if_type == ESP_SERIAL_IF) {
             serial_rx_handler(&buf_handle);
@@ -377,7 +372,7 @@ static void process_rx_task(void const *pvParameters)
 
 static uint8_t *get_tx_buffer(uint8_t *is_valid_tx_buf)
 {
-    printf("get_tx_buffer: queue=%d\r\n", (int)uxQueueMessagesWaiting(to_slave_queue));
+    // printf("get_tx_buffer: queue=%d\r\n", (int)uxQueueMessagesWaiting(to_slave_queue));
     struct esp_payload_header *payload_header;
     uint8_t *sendbuf = NULL;
     uint8_t *payload = NULL;
@@ -389,8 +384,8 @@ static uint8_t *get_tx_buffer(uint8_t *is_valid_tx_buf)
     if (pdTRUE != xQueueReceive(to_slave_queue, &buf_handle, 0))
         return NULL;
 
-    printf("get_tx_buffer: got if_type=%d len=%d payload=%p\r\n", 
-    buf_handle.if_type, buf_handle.payload_len, buf_handle.payload);
+    // printf("get_tx_buffer: got if_type=%d len=%d payload=%p\r\n", 
+    // buf_handle.if_type, buf_handle.payload_len, buf_handle.payload);
 
     len = buf_handle.payload_len;
     if (!len) goto done;
