@@ -12,8 +12,14 @@
 static osThreadId app_task_id = 0;
 static volatile uint8_t transport_active = 0;
 
+static osThreadId mqtt_app_task_id = 0;
+static volatile uint8_t mqtt_connected = 0;
+
 static void app_task(void const *arg);
 static void transport_event_handler(uint8_t event);
+
+static void mqtt_app_task(void const *arg);
+static void mqtt_event_handler(uint8_t event);
 
 static void transport_event_handler(uint8_t event)
 {
