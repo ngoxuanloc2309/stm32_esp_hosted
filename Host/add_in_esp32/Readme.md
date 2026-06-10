@@ -84,3 +84,5 @@ idf_component_get_property(protocomm_dir protocomm COMPONENT_DIR)
 target_include_directories(${COMPONENT_LIB} PRIVATE "${protocomm_dir}/src/common")
 
 ====================CODE======================
+
+- In menuconfig (idf.py menuconfig) in Example Configuration you have to allow Network Split using packet port number
