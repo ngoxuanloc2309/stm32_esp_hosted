@@ -34,6 +34,11 @@ HOST_ESP_INCLUDES = \
 #-I$(HOST_ESP_DIR)/stm32/app/control \
 
 # -------------------------------------------------------
+# MQTT
+# -------------------------------------------------------
+MQTT_INCLUDES = -I$(HOST_DIR)/add_on_stm32
+
+# -------------------------------------------------------
 # Protobuf
 # -------------------------------------------------------
 HOST_PROTO_FILES = \
@@ -95,7 +100,7 @@ $(HOST_PROTO_FILES) \
 $(PORT_FILES) \
 $(COMPONENTS_FILES) \
 $(SERVICES_FILES) \
-$(APP_FILES)
+$(APP_FILES) \
 
 HOST_INCLUDES = \
 $(HOST_ESP_INCLUDES) \
@@ -103,6 +108,7 @@ $(HOST_PROTO_INCLUDES) \
 $(PORT_INCLUDES) \
 $(COMPONENTS_INCLUDES) \
 $(SERVICES_INCLUDES) \
-$(APP_INCLUDES)
+$(APP_INCLUDES) \
+$(MQTT_INCLUDES)
 
 HOST_CFLAGS = -DMCU_SYS -DBSSID_LENGTH=18
