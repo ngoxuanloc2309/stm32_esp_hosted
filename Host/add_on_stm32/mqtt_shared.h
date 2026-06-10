@@ -11,6 +11,7 @@
 #define MSG_ID_MQTT_PUBLISH  11
 #define MSG_ID_MQTT_DATA     12
 #define MSG_ID_MQTT_STOP     13
+#define MSG_ID_SLAVE_READY   14
 
 typedef struct {
     char broker_url[MQTT_HANDLER_MAX_BROKER_LEN];

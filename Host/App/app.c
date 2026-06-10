@@ -12,6 +12,8 @@
 static osThreadId app_task_id = 0;
 static volatile uint8_t transport_active = 0;
 static volatile uint8_t wifi_connected   = 0;
+static volatile uint8_t dhcp_got_ip = 0;
+static volatile uint8_t slave_ready = 0;
 
 static void app_task(void const *arg);
 static void transport_event_handler(uint8_t event);
@@ -41,6 +43,10 @@ static int wifi_event_handler(ctrl_cmd_t *event)
     } else if (event->msg_id == CTRL_EVENT_STATION_DISCONNECT_FROM_AP) {
         printf("WiFi disconnected event!\r\n");
         wifi_connected = 0;
+        dhcp_got_ip = 0;
+    } else if (event->msg_id == CTRL_EVENT_DHCP_DNS_STATUS) {
+        printf("DHCP got IP!\r\n");
+        dhcp_got_ip = 1;
     }
     return 0;
 }
@@ -54,6 +60,10 @@ static int mqtt_data_event_handler(ctrl_cmd_t *event)
         mqtt_incoming_t *incoming = (mqtt_incoming_t *)data->data;
         printf("MQTT RX topic=[%s] msg=[%s]\r\n",
                incoming->topic, incoming->message);
+    }
+    if (data->custom_msg_id == MSG_ID_SLAVE_READY) {
+        printf("Slave ready!\r\n");
+        slave_ready = 1;
     }
     return 0;
 }
@@ -81,6 +91,7 @@ static void app_task(void const *arg)
                        wifi_event_handler);
     set_event_callback(CTRL_EVENT_CUSTOM_RPC_UNSERIALISED_MSG,
                        mqtt_data_event_handler);
+    set_event_callback(CTRL_EVENT_DHCP_DNS_STATUS, wifi_event_handler);
 
     /* 2. Get MAC */
     req->msg_type        = CTRL_REQ;
@@ -129,7 +140,7 @@ static void app_task(void const *arg)
     /* 5. Đợi WiFi connected event tối đa 30s */
     printf("Waiting WiFi connected event...\r\n");
     int timeout = 0;
-    while (!wifi_connected && timeout < 300) {
+    while (!slave_ready && timeout < 300) {
         osDelay(100);
         timeout++;
     }
@@ -137,7 +148,7 @@ static void app_task(void const *arg)
         printf("WiFi connect timeout!\r\n");
         goto cleanup;
     }
-    printf("WiFi connected confirmed!\r\n");
+    printf("Slave ready confirmed!\r\n");
     osDelay(1000);
 
     /* 6. Send MQTT start */
@@ -196,6 +207,7 @@ cleanup:
     CLEANUP_CTRL_MSG(resp);
     if (req) hosted_free(req);
     vTaskSuspend(NULL);
+
 }
 
 void app_main(void)
