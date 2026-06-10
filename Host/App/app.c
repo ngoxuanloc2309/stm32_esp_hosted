@@ -65,6 +65,10 @@ static int mqtt_data_event_handler(ctrl_cmd_t *event)
         printf("Slave ready!\r\n");
         slave_ready = 1;
     }
+    if (event->free_buffer_handle && event->free_buffer_func) {
+        event->free_buffer_func(event->free_buffer_handle);
+    }
+    hosted_free(event);
     return 0;
 }
 

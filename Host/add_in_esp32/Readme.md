@@ -10,10 +10,6 @@ In the location: Host/libs/esp-hosted/esp_hosted_fg/esp/esp_driver/network_adapt
 
 - Define more config status message:
 
-#define MSG_ID_MQTT_START  	10 /*host -> CP: start MQTT*/
-#define MSG_ID_MQTT_PUBLISH 11 /*host -> CP: publish MQTT*/
-#define MSG_ID_MQTT_STOP	12 /*host -> CP: stop MQTT*/
-
 - in lines: 71-85 add code:
 	/*Add in*/
 	case MSG_ID_MQTT_START:
