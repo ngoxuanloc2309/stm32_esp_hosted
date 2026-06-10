@@ -2,13 +2,27 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include "netdev_if.h"
+#include "netdev_ext.h"
+
+#define NETDEV_RX_QUEUE_SIZE 10
 
 struct netdev {
     char name[16];
     void *priv;
     struct netdev_ops *ops;
 };
+
+static QueueHandle_t s_rx_queue = NULL;
+
+void netdev_rx_queue_init(void)
+{
+    s_rx_queue = xQueueCreate(NETDEV_RX_QUEUE_SIZE, sizeof(struct pbuf *));
+}
+
+QueueHandle_t netdev_get_rx_queue(void)
+{
+    return s_rx_queue;
+}
 
 netdev_handle_t netdev_alloc(uint32_t sizeof_priv, char *name)
 {
@@ -47,8 +61,15 @@ int netdev_unregister(netdev_handle_t netdev)
 int netdev_rx(netdev_handle_t netdev, struct pbuf *net_buf)
 {
     if (!netdev || !net_buf) return -1;
-    /* placeholder: forward to network stack when LwIP is added */
-    if (net_buf->payload) free(net_buf->payload);
-    free(net_buf);
+    if (!s_rx_queue) {
+        free(net_buf->payload);
+        free(net_buf);
+        return -1;
+    }
+    if (xQueueSend(s_rx_queue, &net_buf, 0) != pdTRUE) {
+        free(net_buf->payload);
+        free(net_buf);
+        return -1;
+    }
     return 0;
 }

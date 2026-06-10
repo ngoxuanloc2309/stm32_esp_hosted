@@ -353,12 +353,13 @@ static void process_rx_task(void const *pvParameters)
                 memcpy(buffer->payload, buf_handle.payload, buf_handle.payload_len);
                 netdev_rx(priv->netdev, buffer);
                 // Free the pbuf struct (payload might be managed by netdev)
-                free(buffer);
-                buffer = NULL;
+                // free(buffer);
+                // buffer = NULL;
             }
 
         } else if (buf_handle.if_type == ESP_PRIV_IF) {
             first_trans = 0;
+            free(buffer);
             buffer = (struct pbuf *)malloc(sizeof(struct pbuf));
             assert(buffer);
             buffer->len     = buf_handle.payload_len;

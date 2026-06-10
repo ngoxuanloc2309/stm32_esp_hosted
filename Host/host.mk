@@ -2,8 +2,11 @@
 # Host layer build configuration
 # -------------------------------------------------------
 
+include libs/lwip/src/Filelists.mk
+
 HOST_DIR = Host
 HOST_ESP_DIR = $(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host
+HOST_LWIP_DIR = $(HOST_DIR)/libs/
 
 # -------------------------------------------------------
 # ESP-Hosted-FG files
@@ -70,7 +73,8 @@ COMPONENTS_FILES = \
 $(HOST_DIR)/Components/trans_spi/src/ctrl_core_wrapper.c \
 $(HOST_DIR)/Components/trans_spi/src/transport_drv.c \
 $(HOST_DIR)/Components/trans_spi/src/spi_drv.c \
-$(HOST_DIR)/Components/trans_spi/src/netdev_if.c
+$(HOST_DIR)/Components/trans_spi/src/netdev_if.c \
+$(HOST_DIR)/Components/network/src/wifi_netif.c
 
 COMPONENTS_INCLUDES = \
 -I$(HOST_DIR)/Components/trans_spi/include
@@ -78,18 +82,22 @@ COMPONENTS_INCLUDES = \
 # -------------------------------------------------------
 # Services
 # -------------------------------------------------------
-SERVICES_FILES =
+SERVICES_FILES = \
+$(HOST_DIR)/Services/service_mqtt.c
 
-SERVICES_INCLUDES =
+SERVICES_INCLUDES = \
+-I$(HOST_DIR)/Services
 
 # -------------------------------------------------------
 # App
 # -------------------------------------------------------
 APP_FILES = \
-$(HOST_DIR)/App/app.c
+$(HOST_DIR)/App/app.c \
+$(HOST_DIR)/App/user/user_mqtt.c
 
 APP_INCLUDES = \
--I$(HOST_DIR)/App
+-I$(HOST_DIR)/App\
+-I$(HOST_DIR)/App/user
 
 # -------------------------------------------------------
 # Aggregate
