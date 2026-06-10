@@ -137,7 +137,7 @@ static void app_task(void const *arg)
     printf("Connect AP sent: %s\r\n", APP_WIFI_SSID);
     CLEANUP_CTRL_MSG(resp);
 
-    /* 5. Đợi WiFi connected event tối đa 30s */
+    /* 5. Wait WiFi connected event max 30s */
     printf("Waiting WiFi connected event...\r\n");
     int timeout = 0;
     while (!slave_ready && timeout < 300) {
@@ -173,7 +173,7 @@ static void app_task(void const *arg)
     printf("MQTT start sent!\r\n");
     CLEANUP_CTRL_MSG(resp);
 
-    /* 7. Đợi MQTT client start xong (WiFi connected + 2s delay trong ESP32) */
+    /* 7. Wait mqtt connect OK (WiFi connected + 2s delay ESP32) */
     osDelay(5000);
 
     /* 8. Publish test message */
@@ -197,7 +197,7 @@ static void app_task(void const *arg)
     printf("MQTT publish sent!\r\n");
     CLEANUP_CTRL_MSG(resp);
 
-    /* 9. Loop nhận MQTT messages */
+    /* 9. Loop receive mqtt message */
     printf("Waiting for MQTT messages...\r\n");
     for (;;) {
         osDelay(1000);
