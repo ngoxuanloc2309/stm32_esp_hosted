@@ -344,6 +344,7 @@ static void process_rx_task(void const *pvParameters)
             serial_rx_handler(&buf_handle);
 
         } else if (buf_handle.if_type == ESP_STA_IF || buf_handle.if_type == ESP_AP_IF) {
+            printf("STA/AP packet len=%d\r\n", buf_handle.payload_len);
             priv = get_priv(buf_handle.if_type, buf_handle.if_num);
             if (priv) {
                 buffer = (struct pbuf *)malloc(sizeof(struct pbuf));

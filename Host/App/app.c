@@ -11,6 +11,7 @@
 #include "app_config.h"
 #include "wifi_netif.h"
 #include "user_mqtt.h"
+#include "netdev_ext.h"
 
 static osThreadId        app_task_id      = 0;
 static volatile uint8_t  transport_active = 0;
@@ -78,9 +79,12 @@ static void app_task(void const *arg)
         goto cleanup;
     }
     printf("WiFi mode STA OK\r\n");
-    CLEANUP_CTRL_MSG(resp);
+    CLEANUP_CTRL_MSG(resp);    
 
     /* 3. Init lwIP netif before connecting — DHCP will start immediately */
+    netdev_rx_queue_init();
+    printf("netdev rx queue inited\r\n");
+
     if (wifi_netif_init() != 0) {
         printf("wifi_netif_init failed\r\n");
         goto cleanup;

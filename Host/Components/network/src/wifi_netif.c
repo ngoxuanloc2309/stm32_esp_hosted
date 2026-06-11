@@ -14,7 +14,7 @@
 
 #define WIFI_NETIF_MTU          1500
 #define WIFI_NETIF_INPUT_TASK_STACK 1024
-#define WIFI_NETIF_INPUT_TASK_PRIO  osPriorityAboveNormal
+#define WIFI_NETIF_INPUT_TASK_PRIO  osPriorityNormal
 #define WIFI_NETIF_TIMEOUT_TASK_STACK 512
 #define WIFI_NETIF_TIMEOUT_TASK_PRIO  osPriorityLow
 
@@ -75,12 +75,21 @@ static void netif_status_callback(struct netif *netif)
 static void wifi_netif_input_task(void const *arg)
 {
     (void)arg;
+    printf("wifi_input_task started\r\n");
     QueueHandle_t q = netdev_get_rx_queue();
+    printf("rx_queue=%p\r\n", q);
+    if (!q) {
+        printf("ERROR: rx queue is NULL!\r\n");
+        vTaskSuspend(NULL);
+        return;
+    }
     struct pbuf *raw = NULL;
 
     for (;;) {
+        printf("waiting for rx packet...\r\n");
         if (xQueueReceive(q, &raw, portMAX_DELAY) != pdTRUE)
             continue;
+        printf("got rx packet len=%d\r\n", raw->len);
 
         struct pbuf *p = pbuf_alloc(PBUF_RAW, raw->len, PBUF_POOL);
         if (!p) {
@@ -120,12 +129,17 @@ int wifi_netif_is_up(void)
 
 int wifi_netif_init(void)
 {
+    printf("lwip initlizing ...\r\n");
     lwip_init();
+    printf("lwip init done\r\n");
 
     ip4_addr_t ipaddr, netmask, gw;
+
+    printf("lwip set zero ip, netmask, gw\r\n");
     ip4_addr_set_zero(&ipaddr);
     ip4_addr_set_zero(&netmask);
     ip4_addr_set_zero(&gw);
+    printf("lwip set zero ip, netmask, gw DONE\r\n");
 
     if (!netif_add(&wifi_netif, &ipaddr, &netmask, &gw,
                    NULL, wifi_netif_low_init, ethernet_input)) {
@@ -133,20 +147,28 @@ int wifi_netif_init(void)
         return -1;
     }
 
+    printf("netif set default\r\n");
     netif_set_default(&wifi_netif);
+    printf("netif set default OK\r\n");
+    printf("netif set status CB\r\n");
     netif_set_status_callback(&wifi_netif, netif_status_callback);
+    printf("netif set status CB OK\r\n");
+    printf("netif setup\r\n");
     netif_set_up(&wifi_netif);
-
+    printf("netif setup OK\r\n");
+    printf("DHCP starting...\r\n");
     dhcp_start(&wifi_netif);
     printf("DHCP started\r\n");
 
     osThreadDef(wifi_input, wifi_netif_input_task,
                 WIFI_NETIF_INPUT_TASK_PRIO, 0, WIFI_NETIF_INPUT_TASK_STACK);
     osThreadCreate(osThread(wifi_input), NULL);
+    printf("Thread input created\r\n");
 
     osThreadDef(lwip_timeout, wifi_netif_timeout_task,
                 WIFI_NETIF_TIMEOUT_TASK_PRIO, 0, WIFI_NETIF_TIMEOUT_TASK_STACK);
     osThreadCreate(osThread(lwip_timeout), NULL);
+    printf("Thread lwip timeout created\r\n");
 
     return 0;
 }
