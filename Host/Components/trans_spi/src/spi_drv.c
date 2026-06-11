@@ -10,6 +10,7 @@
 #include "netdev_if.h"
 #include "stats.h"
 #include "board_config.h"
+#include "lwip/pbuf.h"
 
 #define TO_SLAVE_QUEUE_SIZE         10
 #define FROM_SLAVE_QUEUE_SIZE       10

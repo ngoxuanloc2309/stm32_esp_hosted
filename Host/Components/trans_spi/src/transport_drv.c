@@ -1,4 +1,5 @@
 /*transport_drv.c*/
+#include "lwip/pbuf.h"
 #include "transport_drv.h"
 #include "stats.h"
 

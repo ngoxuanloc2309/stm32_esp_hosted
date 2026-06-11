@@ -2,11 +2,9 @@
 # Host layer build configuration
 # -------------------------------------------------------
 
-include libs/lwip/src/Filelists.mk
-
-HOST_DIR = Host
-HOST_ESP_DIR = $(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host
-HOST_LWIP_DIR = $(HOST_DIR)/libs/
+HOST_DIR        = Host
+HOST_ESP_DIR    = $(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host
+HOST_LWIP_DIR   = $(HOST_DIR)/libs/lwip
 
 # -------------------------------------------------------
 # ESP-Hosted-FG files
@@ -18,28 +16,20 @@ $(HOST_ESP_DIR)/stm32/common/stats.c \
 $(HOST_ESP_DIR)/control_lib/src/ctrl_api.c \
 $(HOST_ESP_DIR)/stm32/driver/serial/serial_ll_if.c \
 $(HOST_ESP_DIR)/components/src/esp_queue.c \
-$(HOST_ESP_DIR)/virtual_serial_if/src/serial_if.c \
-# $(HOST_ESP_DIR)/stm32/app/control/control.c
+$(HOST_ESP_DIR)/virtual_serial_if/src/serial_if.c
 
 HOST_ESP_INCLUDES = \
 -I$(HOST_ESP_DIR)/stm32/common \
 -I$(HOST_ESP_DIR)/stm32/port/include \
 -I$(HOST_ESP_DIR)/stm32/driver/transport \
--I$(HOST_ESP_DIR)/stm32/driver/netif \
 -I$(HOST_ESP_DIR)/stm32/driver/serial \
 -I$(HOST_ESP_DIR)/stm32/virtual_serial_if/include \
 -I$(HOST_ESP_DIR)/control_lib/include \
 -I$(HOST_ESP_DIR)/control_lib/src/include \
 -I$(HOST_ESP_DIR)/components/include \
 -I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/common/include \
--I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host/virtual_serial_if/include
-
-#-I$(HOST_ESP_DIR)/stm32/app/control \
-
-# -------------------------------------------------------
-# MQTT
-# -------------------------------------------------------
-MQTT_INCLUDES = -I$(HOST_DIR)/add_on_stm32
+-I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/host/virtual_serial_if/include \
+# -I$(HOST_ESP_DIR)/stm32/driver/netif 
 
 # -------------------------------------------------------
 # Protobuf
@@ -54,6 +44,46 @@ HOST_PROTO_INCLUDES = \
 -I$(HOST_DIR)/libs/esp-hosted/esp_hosted_fg/common
 
 # -------------------------------------------------------
+# lwIP core
+# -------------------------------------------------------
+LWIPDIR = $(HOST_LWIP_DIR)/src
+
+LWIP_FILES = \
+$(LWIPDIR)/core/init.c \
+$(LWIPDIR)/core/def.c \
+$(LWIPDIR)/core/dns.c \
+$(LWIPDIR)/core/inet_chksum.c \
+$(LWIPDIR)/core/ip.c \
+$(LWIPDIR)/core/mem.c \
+$(LWIPDIR)/core/memp.c \
+$(LWIPDIR)/core/netif.c \
+$(LWIPDIR)/core/pbuf.c \
+$(LWIPDIR)/core/raw.c \
+$(LWIPDIR)/core/stats.c \
+$(LWIPDIR)/core/sys.c \
+$(LWIPDIR)/core/tcp.c \
+$(LWIPDIR)/core/tcp_in.c \
+$(LWIPDIR)/core/tcp_out.c \
+$(LWIPDIR)/core/timeouts.c \
+$(LWIPDIR)/core/udp.c \
+$(LWIPDIR)/core/ipv4/dhcp.c \
+$(LWIPDIR)/core/ipv4/etharp.c \
+$(LWIPDIR)/core/ipv4/icmp.c \
+$(LWIPDIR)/core/ipv4/ip4.c \
+$(LWIPDIR)/core/ipv4/ip4_addr.c \
+$(LWIPDIR)/core/ipv4/ip4_frag.c \
+$(LWIPDIR)/core/ipv4/acd.c \
+$(LWIPDIR)/netif/ethernet.c \
+$(LWIPDIR)/apps/mqtt/mqtt.c \
+$(LWIPDIR)/api/tcpip.c \
+# $(HOST_LWIP_DIR)/system/OS/sys_arch.c
+
+LWIP_INCLUDES = \
+-I$(LWIPDIR)/include \
+-I$(HOST_DIR)/Components/network/include \
+-I$(HOST_LWIP_DIR)/system 
+
+# -------------------------------------------------------
 # Port
 # -------------------------------------------------------
 PORT_FILES = \
@@ -61,10 +91,13 @@ $(HOST_DIR)/Port/src/port_os.c \
 $(HOST_DIR)/Port/src/port_spi.c \
 $(HOST_DIR)/Port/src/port_gpio.c \
 $(HOST_DIR)/Port/src/port_log.c \
-$(HOST_DIR)/Port/src/port_serial_drv.c
+$(HOST_DIR)/Port/src/port_serial_drv.c \
+$(HOST_DIR)/Port/src/sys_arch.c
 
 PORT_INCLUDES = \
--I$(HOST_DIR)/Port/include
+-I$(HOST_DIR)/Port/include \
+-I$(HOST_DIR)/Port/include/arch \
+-I$(HOST_DIR)/Port/include/port_lwip \
 
 # -------------------------------------------------------
 # Components
@@ -77,27 +110,28 @@ $(HOST_DIR)/Components/trans_spi/src/netdev_if.c \
 $(HOST_DIR)/Components/network/src/wifi_netif.c
 
 COMPONENTS_INCLUDES = \
--I$(HOST_DIR)/Components/trans_spi/include
+-I$(HOST_DIR)/Components/trans_spi/include \
+-I$(HOST_DIR)/Components/network/include
 
 # -------------------------------------------------------
 # Services
 # -------------------------------------------------------
 SERVICES_FILES = \
-$(HOST_DIR)/Services/service_mqtt.c
+$(HOST_DIR)/Services/mqtt/service_mqtt.c
 
 SERVICES_INCLUDES = \
--I$(HOST_DIR)/Services
+-I$(HOST_DIR)/Services/mqtt
 
 # -------------------------------------------------------
 # App
 # -------------------------------------------------------
 APP_FILES = \
 $(HOST_DIR)/App/app.c \
-$(HOST_DIR)/App/user/user_mqtt.c
+$(HOST_DIR)/App/user/user_mqtt/user_mqtt.c
 
 APP_INCLUDES = \
--I$(HOST_DIR)/App\
--I$(HOST_DIR)/App/user
+-I$(HOST_DIR)/App \
+-I$(HOST_DIR)/App/user/user_mqtt
 
 # -------------------------------------------------------
 # Aggregate
@@ -105,18 +139,20 @@ APP_INCLUDES = \
 HOST_SOURCES = \
 $(HOST_ESP_FILES) \
 $(HOST_PROTO_FILES) \
+$(LWIP_FILES) \
 $(PORT_FILES) \
 $(COMPONENTS_FILES) \
 $(SERVICES_FILES) \
-$(APP_FILES) \
+$(APP_FILES)
 
 HOST_INCLUDES = \
 $(HOST_ESP_INCLUDES) \
 $(HOST_PROTO_INCLUDES) \
 $(PORT_INCLUDES) \
+$(LWIP_INCLUDES) \
 $(COMPONENTS_INCLUDES) \
 $(SERVICES_INCLUDES) \
-$(APP_INCLUDES) \
-$(MQTT_INCLUDES)
+$(APP_INCLUDES)
 
-HOST_CFLAGS = -DMCU_SYS -DBSSID_LENGTH=18
+HOST_CFLAGS = -DMCU_SYS -DBSSID_LENGTH=18 \
+              -include Host/Port/include/port_lwip/platform_wrapper_fix.h

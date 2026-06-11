@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include "lwip/pbuf.h"
 #include "netdev_ext.h"
 
 #define NETDEV_RX_QUEUE_SIZE 10

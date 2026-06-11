@@ -1,6 +1,8 @@
 #ifndef __LWIPOPTS_H
 #define __LWIPOPTS_H
 
+/* USER DEFINE */
+
 /* ---- FreeRTOS integration ---- */
 #define NO_SYS                      0
 #define LWIP_FREERTOS_THREAD_STACKSIZE 512
