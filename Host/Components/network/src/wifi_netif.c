@@ -5,6 +5,7 @@
 #include "lwip/init.h"
 #include "lwip/netif.h"
 #include "lwip/etharp.h"
+#include "lwip/dhcp.h"
 #include "lwip/timeouts.h"
 #include "lwip/ip4_addr.h"
 #include "netif/ethernet.h"
@@ -23,7 +24,7 @@ struct netif wifi_netif;
 static uint8_t          s_mac[6]   = {0x02, 0x00, 0x00, 0x00, 0x00, 0x01};
 static volatile uint8_t s_netif_up = 0;
 
-/* ---------- low-level output: copy pbuf chain → send over SPI ---------- */
+/* ---------- low-level output: copy pbuf chain -> send over SPI ---------- */
 static err_t low_level_output(struct netif *netif, struct pbuf *p)
 {
     (void)netif;
@@ -59,11 +60,11 @@ static err_t wifi_netif_low_init(struct netif *netif)
     return ERR_OK;
 }
 
-/* ---------- status callback: fires when IP is set ------------------- */
+/* ---------- status callback: fires when IP is set (DHCP done) ------- */
 static void netif_status_callback(struct netif *netif)
 {
     if (netif_is_up(netif) && !ip4_addr_isany_val(*netif_ip4_addr(netif))) {
-        printf("IP:  %s\r\n", ip4addr_ntoa(netif_ip4_addr(netif)));
+        printf("DHCP got IP: %s\r\n", ip4addr_ntoa(netif_ip4_addr(netif)));
         printf("GW:  %s\r\n", ip4addr_ntoa(netif_ip4_gw(netif)));
         printf("NM:  %s\r\n", ip4addr_ntoa(netif_ip4_netmask(netif)));
         s_netif_up = 1;
@@ -72,7 +73,7 @@ static void netif_status_callback(struct netif *netif)
     }
 }
 
-/* ---------- RX task: dequeue frames from SPI driver → lwIP ---------- */
+/* ---------- RX task: dequeue frames from SPI driver -> lwIP ---------- */
 static void wifi_netif_input_task(void const *arg)
 {
     (void)arg;
@@ -128,32 +129,6 @@ int wifi_netif_is_up(void)
     return s_netif_up;
 }
 
-/**
- * wifi_netif_set_static_ip
- *
- * Called from the CTRL_EVENT_DHCP_DNS_STATUS callback in app.c after the
- * ESP32 slave has obtained an IP from the router.  Sets the lwIP netif
- * address directly — no DHCP needed on the STM32 side.
- *
- * @param ip  dotted-decimal string, e.g. "10.43.137.37"
- * @param nm  dotted-decimal string, e.g. "255.255.255.0"
- * @param gw  dotted-decimal string, e.g. "10.43.137.137"
- */
-void wifi_netif_set_static_ip(const char *ip, const char *nm, const char *gw)
-{
-    ip4_addr_t ipaddr, netmask, gateway;
-
-    if (!ip4addr_aton(ip, &ipaddr)  ||
-        !ip4addr_aton(nm, &netmask) ||
-        !ip4addr_aton(gw, &gateway)) {
-        printf("wifi_netif_set_static_ip: invalid address string\r\n");
-        return;
-    }
-
-    /* netif_set_addr triggers netif_status_callback, which sets s_netif_up */
-    netif_set_addr(&wifi_netif, &ipaddr, &netmask, &gateway);
-}
-
 int wifi_netif_init(void)
 {
     printf("lwip initializing...\r\n");
@@ -174,8 +149,9 @@ int wifi_netif_init(void)
     netif_set_status_callback(&wifi_netif, netif_status_callback);
     netif_set_up(&wifi_netif);
     netif_set_link_up(&wifi_netif);
-    /* NOTE: no dhcp_start() — IP is assigned by wifi_netif_set_static_ip()
-     *       once the ESP32 slave reports its DHCP result via ctrl event.   */
+
+    dhcp_start(&wifi_netif);
+    printf("DHCP started\r\n");
 
     osThreadDef(wifi_input, wifi_netif_input_task,
                 WIFI_NETIF_INPUT_TASK_PRIO, 0, WIFI_NETIF_INPUT_TASK_STACK);
@@ -185,6 +161,6 @@ int wifi_netif_init(void)
                 WIFI_NETIF_TIMEOUT_TASK_PRIO, 0, WIFI_NETIF_TIMEOUT_TASK_STACK);
     osThreadCreate(osThread(lwip_timeout), NULL);
 
-    printf("lwip netif ready (waiting for IP from ESP32)\r\n");
+    printf("lwip netif ready (waiting for DHCP)\r\n");
     return 0;
 }
