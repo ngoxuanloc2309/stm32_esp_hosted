@@ -136,8 +136,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 static stm_ret_t spi_transaction_v2(uint8_t *txbuff)
 {
     uint32_t heap_before = xPortGetFreeHeapSize();
-    printf("spi_tx_v2 ENTER\r\n");
-    printf("SPI_TX: heap=%d\r\n", heap_before);
+    // printf("spi_tx_v2 ENTER\r\n");
+    // printf("SPI_TX: heap=%d\r\n", heap_before);
     uint8_t *rxbuff = NULL;
     uint8_t txbuff_allocated = 0;
     interface_buffer_handle_t buf_handle = {0};
@@ -146,10 +146,10 @@ static stm_ret_t spi_transaction_v2(uint8_t *txbuff)
     HAL_StatusTypeDef retval = HAL_ERROR;
     uint16_t rx_checksum = 0, checksum = 0;
 
-    printf("SPI_TX: heap=%d\r\n", xPortGetFreeHeapSize());
+    // printf("SPI_TX: heap=%d\r\n", xPortGetFreeHeapSize()); 
     rxbuff = (uint8_t *)malloc(MAX_SPI_BUFFER_SIZE);
     assert(rxbuff);
-    printf("rxbuff=%p\r\n", rxbuff);
+    // printf("rxbuff=%p\r\n", rxbuff); 
     if (!rxbuff) {
         printf("rxbuff MALLOC FAILED\r\n");
         return STM_FAIL;
@@ -158,7 +158,7 @@ static stm_ret_t spi_transaction_v2(uint8_t *txbuff)
 
     if (!txbuff) {
         txbuff = (uint8_t *)malloc(MAX_SPI_BUFFER_SIZE);
-        printf("txbuff=%p\r\n", txbuff);
+        // printf("txbuff=%p\r\n", txbuff);
         if (!txbuff) {
             printf("txbuff MALLOC FAILED\r\n");
             free(rxbuff);
@@ -172,12 +172,12 @@ static stm_ret_t spi_transaction_v2(uint8_t *txbuff)
 
     HAL_GPIO_WritePin(USR_SPI_CS_GPIO_Port, USR_SPI_CS_Pin, GPIO_PIN_RESET);
     HAL_Delay(66);
-    printf("CS LOW - starting transfer\r\n");
+    // printf("CS LOW - starting transfer\r\n");
     retval = HAL_SPI_TransmitReceive(USER_SPI, txbuff, rxbuff,
             MAX_SPI_BUFFER_SIZE, HAL_MAX_DELAY);
-    printf("transfer done\r\n");
-    printf("RX raw 32byte: ");
-    for(int i=0; i<32; i++) printf(" %02X", rxbuff[i]);
+    // printf("transfer done\r\n");
+    // printf("RX raw 32byte: ");
+    // for(int i=0; i<32; i++) printf(" %02X", rxbuff[i]);
     while (USER_SPI->State == HAL_SPI_STATE_BUSY);
     HAL_GPIO_WritePin(USR_SPI_CS_GPIO_Port, USR_SPI_CS_Pin, GPIO_PIN_SET);
 
@@ -225,7 +225,7 @@ static stm_ret_t spi_transaction_v2(uint8_t *txbuff)
         return STM_FAIL;
     }
 
-    printf("queued to from_slave OK\r\n");
+    // printf("queued to from_slave OK\r\n"); 
 
     uint32_t heap_after = xPortGetFreeHeapSize();
     printf("SPI_TRANS EXIT: heap_before=%d, heap_after=%d, diff=%d\r\n", 
@@ -261,7 +261,7 @@ static void check_and_execute_spi_transaction(void)
             }
             osDelay(1);
         }
-        printf("check_exec: HS ready, calling SPI\r\n");
+        // printf("check_exec: HS ready, calling SPI\r\n"); 
     }
 
     // printf("check_exec: taking mutex\r\n");
@@ -324,15 +324,15 @@ static void transaction_task(void const *pvParameters)
             hs = HAL_GPIO_ReadPin(GPIO_HANDSHAKE_PORT, GPIO_HANDSHAKE_PIN);
             dr = HAL_GPIO_ReadPin(GPIO_DATA_READY_PORT, GPIO_DATA_READY_PIN);
             if (hs == GPIO_PIN_SET && dr == GPIO_PIN_SET) {
-                printf("TT: polling response HS=%d DR=%d elapsed=%lu\r\n", hs, dr, HAL_GetTick()-tick);
-                printf("Check and execute spi transaction first\r\n");
+                // printf("TT: polling response HS=%d DR=%d elapsed=%lu\r\n", hs, dr, HAL_GetTick()-tick);
+                // printf("Check and execute spi transaction first\r\n");
                 check_and_execute_spi_transaction();
                 osDelay(5);
                 break;
             }
             osDelay(1);
         }
-        printf("TT: poll timeout HS=%d DR=%d\r\n", hs, dr);
+        // printf("TT: poll timeout HS=%d DR=%d\r\n", hs, dr);
         // printf("TT: poll done elapsed=%lu\r\n", HAL_GetTick() - tick);
     }
 }
@@ -426,7 +426,7 @@ static uint8_t *get_tx_buffer(uint8_t *is_valid_tx_buf)
     printf("get_tx_buffer: sendbuf=%p\r\n", sendbuf);
     if (!sendbuf) { printf("get_tx_buffer: malloc failed\r\n"); goto done; }
 
-    printf("get_tx_buffer: memset\r\n");
+    // printf("get_tx_buffer: memset\r\n"); 
     memset(sendbuf, 0, MAX_SPI_BUFFER_SIZE);
     printf("get_tx_buffer: building header\r\n");
     payload_header = (struct esp_payload_header *)sendbuf;

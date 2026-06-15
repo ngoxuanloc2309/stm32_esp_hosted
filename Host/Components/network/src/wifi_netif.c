@@ -110,7 +110,9 @@ static void wifi_netif_input_task(void const *arg)
         free(raw);
 
         // if (wifi_netif.input(p, &wifi_netif) != ERR_OK)
-        if (tcpip_input(p, &wifi_netif) != ERR_OK)
+        err_t err = tcpip_input(p, &wifi_netif);
+        printf("tcpip_input ret=%d\r\n", err);  // thêm dòng này
+        if (err != ERR_OK)
             pbuf_free(p);
     }
 }
