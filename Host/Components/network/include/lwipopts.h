@@ -86,9 +86,16 @@
 /* #define DHCP_DEBUG       LWIP_DBG_ON */
 /* #define TCP_DEBUG        LWIP_DBG_ON */
 
+#define LWIP_DBG_MIN_LEVEL  LWIP_DBG_LEVEL_ALL
+#define LWIP_DBG_TYPES_ON   LWIP_DBG_ON
+
+#define LWIP_DEBUG          1
+#define DHCP_DEBUG          LWIP_DBG_ON
+#define ETHARP_DEBUG        LWIP_DBG_ON
+
 #define TCPIP_MBOX_SIZE          16
-#define TCPIP_THREAD_STACKSIZE   1024
-#define TCPIP_THREAD_PRIO        5
+#define TCPIP_THREAD_STACKSIZE   2048
+#define TCPIP_THREAD_PRIO        7
 #define DEFAULT_THREAD_STACKSIZE 512
 
 #endif

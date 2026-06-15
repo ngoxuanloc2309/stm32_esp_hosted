@@ -54,6 +54,8 @@ static err_t wifi_netif_low_init(struct netif *netif)
 {
     netif->hwaddr_len = ETH_HWADDR_LEN;
     memcpy(netif->hwaddr, s_mac, ETH_HWADDR_LEN);
+    printf("netif MAC: %02x:%02x:%02x:%02x:%02x:%02x\r\n",
+           s_mac[0],s_mac[1],s_mac[2],s_mac[3],s_mac[4],s_mac[5]);
     netif->mtu        = WIFI_NETIF_MTU;
     netif->flags      = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_LINK_UP;
     netif->output     = etharp_output;
@@ -94,11 +96,12 @@ static void wifi_netif_input_task(void const *arg)
 
     struct pbuf *raw = NULL;
     for (;;) {
-        if (xQueueReceive(q, &raw, portMAX_DELAY) != pdTRUE)
+        // if (xQueueReceive(q, &raw, portMAX_DELAY) != pdTRUE)
+        if (xQueueReceive(q, &raw, pdMS_TO_TICKS(1000)) != pdTRUE)
             continue;
         printf("netif_input: got pbuf len=%d\r\n", raw->len);
 
-        struct pbuf *p = pbuf_alloc(PBUF_RAW, raw->len, PBUF_POOL);
+        struct pbuf *p = pbuf_alloc(PBUF_RAW, raw->len, PBUF_RAM);
         if (!p) {
             free(raw->payload);
             free(raw);
@@ -110,8 +113,8 @@ static void wifi_netif_input_task(void const *arg)
         free(raw);
 
         // if (wifi_netif.input(p, &wifi_netif) != ERR_OK)
-        err_t err = tcpip_input(p, &wifi_netif);
-        printf("tcpip_input ret=%d\r\n", err);  // thêm dòng này
+        err_t err = wifi_netif.input(p, &wifi_netif);
+        printf("netif_input ret=%d\r\n", err);
         if (err != ERR_OK)
             pbuf_free(p);
     }
@@ -132,7 +135,10 @@ static void wifi_netif_timeout_task(void const *arg)
 
 void wifi_netif_set_mac(uint8_t *mac)
 {
+    printf("set_mac: s_mac addr=%p\r\n", s_mac);
     if (mac) memcpy(s_mac, mac, 6);
+    printf("set_mac: done %02x:%02x:%02x:%02x:%02x:%02x\r\n",
+           s_mac[0],s_mac[1],s_mac[2],s_mac[3],s_mac[4],s_mac[5]);
 }
 
 int wifi_netif_is_up(void)
@@ -146,13 +152,16 @@ int wifi_netif_init(void)
     // lwip_init();
     tcpip_init(NULL, NULL);
 
+    printf("wifi_netif_init: s_mac=%02x:%02x:%02x:%02x:%02x:%02x\r\n",
+           s_mac[0],s_mac[1],s_mac[2],s_mac[3],s_mac[4],s_mac[5]);
+
     ip4_addr_t ipaddr, netmask, gw;
     ip4_addr_set_zero(&ipaddr);
     ip4_addr_set_zero(&netmask);
     ip4_addr_set_zero(&gw);
 
     if (!netif_add(&wifi_netif, &ipaddr, &netmask, &gw,
-                   NULL, wifi_netif_low_init, ethernet_input)) {
+                   NULL, wifi_netif_low_init, tcpip_input)) {
         printf("netif_add failed\r\n");
         return -1;
     }

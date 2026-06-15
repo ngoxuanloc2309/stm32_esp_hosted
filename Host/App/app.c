@@ -84,8 +84,11 @@ static void app_task(void const *arg)
     printf("MAC: %s\r\n", resp->u.wifi_mac.mac);
     {
         uint8_t mac[6];
-        sscanf(resp->u.wifi_mac.mac, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx",
-               &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]);
+        const char *s = resp->u.wifi_mac.mac;
+        for (int i = 0; i < 6; i++) {
+            mac[i] = (uint8_t)strtol(s, NULL, 16);
+            s += 3;
+        }
         wifi_netif_set_mac(mac);
     }
     CLEANUP_CTRL_MSG(resp);
