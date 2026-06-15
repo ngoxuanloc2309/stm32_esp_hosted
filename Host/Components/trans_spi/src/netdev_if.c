@@ -61,6 +61,7 @@ int netdev_unregister(netdev_handle_t netdev)
 
 int netdev_rx(netdev_handle_t netdev, struct pbuf *net_buf)
 {
+    printf("netdev_rx: q=%p len=%d\r\n", s_rx_queue, net_buf ? net_buf->len : 0);
     if (!netdev || !net_buf) return -1;
     if (!s_rx_queue) {
         free(net_buf->payload);

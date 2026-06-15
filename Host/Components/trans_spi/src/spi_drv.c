@@ -124,6 +124,7 @@ void transport_init(void (*transport_evt_handler_fp)(uint8_t))
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == GPIO_DATA_READY_PIN || GPIO_Pin == GPIO_HANDSHAKE_PIN) {
+        printf("EXTI: pin=%d\r\n", GPIO_Pin);
         if (spi_sem != NULL) {
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
             xSemaphoreGiveFromISR(spi_sem, &xHigherPriorityTaskWoken);
@@ -170,11 +171,13 @@ static stm_ret_t spi_transaction_v2(uint8_t *txbuff)
         osDelay(10);
 
     HAL_GPIO_WritePin(USR_SPI_CS_GPIO_Port, USR_SPI_CS_Pin, GPIO_PIN_RESET);
-    HAL_Delay(10);
+    HAL_Delay(66);
     printf("CS LOW - starting transfer\r\n");
     retval = HAL_SPI_TransmitReceive(USER_SPI, txbuff, rxbuff,
             MAX_SPI_BUFFER_SIZE, HAL_MAX_DELAY);
     printf("transfer done\r\n");
+    printf("RX raw 32byte: ");
+    for(int i=0; i<32; i++) printf(" %02X", rxbuff[i]);
     while (USER_SPI->State == HAL_SPI_STATE_BUSY);
     HAL_GPIO_WritePin(USR_SPI_CS_GPIO_Port, USR_SPI_CS_Pin, GPIO_PIN_SET);
 
@@ -265,6 +268,11 @@ static void check_and_execute_spi_transaction(void)
     xSemaphoreTake(mutex_spi_trans, portMAX_DELAY);
     // printf("check_exec: got mutex\r\n");
     spi_transaction_v2(txbuff);
+    for (int extra = 0; extra < 3; extra++) {
+        if (HAL_GPIO_ReadPin(GPIO_HANDSHAKE_PORT, GPIO_HANDSHAKE_PIN) != GPIO_PIN_SET)
+            break;
+        spi_transaction_v2(NULL);
+    }
     xSemaphoreGive(mutex_spi_trans);
     // printf("check_exec: gave mutex\r\n");
     if (txbuff) { free(txbuff); txbuff = NULL; }
@@ -303,6 +311,7 @@ stm_ret_t send_to_slave(uint8_t iface_type, uint8_t iface_num,
 
 static void transaction_task(void const *pvParameters)
 {
+    GPIO_PinState hs, dr;
     printf("transaction_task started\r\n");
     for (;;) {
         // printf("TT: waiting\r\n");
@@ -312,15 +321,18 @@ static void transaction_task(void const *pvParameters)
 
         uint32_t tick = HAL_GetTick();
         while (HAL_GetTick() - tick < 2000) {
-            GPIO_PinState hs = HAL_GPIO_ReadPin(GPIO_HANDSHAKE_PORT, GPIO_HANDSHAKE_PIN);
-            GPIO_PinState dr = HAL_GPIO_ReadPin(GPIO_DATA_READY_PORT, GPIO_DATA_READY_PIN);
+            hs = HAL_GPIO_ReadPin(GPIO_HANDSHAKE_PORT, GPIO_HANDSHAKE_PIN);
+            dr = HAL_GPIO_ReadPin(GPIO_DATA_READY_PORT, GPIO_DATA_READY_PIN);
             if (hs == GPIO_PIN_SET && dr == GPIO_PIN_SET) {
-                printf("TT: polling response HS=%d DR=%d\r\n", hs, dr);
+                printf("TT: polling response HS=%d DR=%d elapsed=%lu\r\n", hs, dr, HAL_GetTick()-tick);
+                printf("Check and execute spi transaction first\r\n");
                 check_and_execute_spi_transaction();
+                osDelay(5);
                 break;
             }
             osDelay(1);
         }
+        printf("TT: poll timeout HS=%d DR=%d\r\n", hs, dr);
         // printf("TT: poll done elapsed=%lu\r\n", HAL_GetTick() - tick);
     }
 }
@@ -356,7 +368,7 @@ static void process_rx_task(void const *pvParameters)
                 netdev_rx(priv->netdev, buffer);
                 // Free the pbuf struct (payload might be managed by netdev)
                 // free(buffer);
-                // buffer = NULL;
+                buffer = NULL;
             }
 
         } else if (buf_handle.if_type == ESP_PRIV_IF) {
@@ -428,6 +440,8 @@ static uint8_t *get_tx_buffer(uint8_t *is_valid_tx_buf)
     printf("get_tx_buffer: checksum\r\n");
     payload_header->checksum = htole16(compute_checksum(sendbuf,
             sizeof(struct esp_payload_header) + len));
+            printf("TX header: if_type=%d if_num=%d len=%d\r\n",
+    payload_header->if_type, payload_header->if_num, len);
     *is_valid_tx_buf = 1;
     printf("get_tx_buffer: done\r\n");
 

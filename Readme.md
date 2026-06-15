@@ -11,3 +11,12 @@ In the location: Host/libs/esp-hosted/esp_hosted_fg/host/stm32/port/include/plat
 In the location: Host/libs/esp-hosted/esp_hosted_fg/host/virtual_serial_if/src/serial_if.c (line 193)
 
 3. Clear: "mem_free(write_buf);"
+
+4. slave_control.c:
+if (net_link_up) {
+    // esp_netif_up(slave_sta_netif);
+    esp_netif_action_connected(slave_sta_netif, NULL, 0, NULL);
+} else {
+    // esp_netif_down(slave_sta_netif);
+    esp_netif_action_disconnected(slave_sta_netif, NULL, 0, NULL);
+}
