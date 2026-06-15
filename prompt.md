@@ -134,4 +134,45 @@ E:.
 PS E:\prj_canhan\remote\stm32_esp_hosted\Host\Port> cd ..
 PS E:\prj_canhan\remote\stm32_esp_hosted\Host> 
 
+Đây là config bên esp32: 
+(Top) → Example Configuration                                                                                                                                                                                       
+                                                                                 Espressif IoT Development Framework Configuration                                                                                  
+    Transport layer (SPI interface)  --->                                                                                                                                                                           
+    Transport Priority Queue Configuration  --->                                                                                                                                                                    
+    SPI Full-duplex Configuration  --->                                                                                                                                                                             
+    ESP-Hosted Task config  --->                                                                                                                                                                                    
+[*] Enable Mempool                                                                                                                                                                                                  
+    Hosted Debugging  --->                                                                                                                                                                                          
+[*] Allow Network Split using packet port number                                                                                                                                                                    
+        Network split mode configuration  --->                                                                                                                                                                      
+[ ] Allow host to enter deep sleep. Slave will wakeup host using GPIO                                                                                                                                               
+[*] Start CLI at slave                                                                                                                                                                                              
+    Wi-Fi control (Host manages Wi-Fi)  --->                                                                                                                                                                        
+    Wi-Fi Default Example config  --->                                                                                                                                                                              
+[ ] Additional higher layer examples to run                                                                                                                                                                         
+[*] Peer data transfer echo example            
+
+;;;;
+(Top) → Example Configuration → Allow Network Split using packet port number → Network split mode configuration                                                                                                     
+                                                                                 Espressif IoT Development Framework Configuration                                                                                  
+    Slave side (local) LWIP port range (static)  --->                                                                                                                                                               
+    Host side (remote) LWIP port range (static)  --->                                                                                                                                                               
+[*] Extra port forwarding to host (static)                                                                                                                                                                          
+        Host Static Port Forwarding  --->                                                                                                                                                                           
+    Destination LWIP for unfiltered packet (Send packet to host LWIP)  --->    
+
+;;;;
+(Top) → Example Configuration → Allow Network Split using packet port number → Network split mode configuration → Destination LWIP for unfiltered packet                                                            
+                                                                                 Espressif IoT Development Framework Configuration                                                                                  
+( ) Send packet to slave LWIP                                                                                                                                                                                       
+(X) Send packet to host LWIP                                                                                                                                                                                        
+( ) Send packet to both LWIPs 
+;;;
+(Top) → Example Configuration → Allow Network Split using packet port number → Network split mode configuration → Extra port forwarding to host (static) → Host Static Port Forwarding                              
+                                                                                 Espressif IoT Development Framework Configuration                                                                                  
+(22,8554) TCP source ports to forward to host (comma separated)                                                                                                                                                     
+(22,80,443,8080,8554,1883) TCP destination ports to forward to host (comma separated)                                                                                                                               
+(53,67,68) UDP source ports to allowed from host (comma separated)                                                                                                                                                  
+(53,67,68,123) UDP destination ports to forward to host (comma separated)            
+
 Bạn chỉ cần trả lời bằng text, ko cần trả lời bằng ảnh và trả lời lan man để tiết kiệm token. Đồng thời chúng ta hiện tại sẽ ở mode trò chuyện trao đổi, khi nào cần code tôi sẽ bảo mode code (ở mode code bạn sẽ code nhưng ko được comment tiếng Việt, và các kí tự đặc biệt, chỉ comment tiếng Anh và comment ít). Bạn đã rõ chưa để tôi gửi các file code tầng App, Components, port để bạn hiểu thêm.
